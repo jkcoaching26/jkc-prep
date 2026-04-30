@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sentence Insertion — The Power of Reading Aloud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --jk-navy: #002664;
+  --jk-navy-dark: #001a47;
+  --jk-gold: #c9a55c;
+  --gap-blue: #4a6e9c;
+  --bg-page: #d6d8db;
+  --header-bg: #e7ecf2;
+  --border: #c7c7c7;
+  --text: #1a1a1a;
+  --muted: #6b6b6b;
+  --correct-green: #15803d;
+  --wrong-red: #b91c1c;
+  --flag-orange: #d97706;
+}
+html, body {
+  height: 100%;
+  font-family: 'Public Sans', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  color: var(--text);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input { font-family: inherit; }
+
+#app { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+/* TOP BAR (same as summary) */
+.top-bar {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  height: 76px; padding: 0 14px; flex-shrink: 0; gap: 12px;
+}
+.left-cluster { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.zoom-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--jk-navy); color: white; font-size: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.zoom-btn:hover { background: var(--jk-navy-dark); }
+.timer-block { display: flex; align-items: flex-start; gap: 8px; }
+.timer-digits { display: flex; align-items: baseline; font-weight: 700; font-variant-numeric: tabular-nums; }
+.timer-digits .num { font-size: 26px; line-height: 1; }
+.timer-digits .colon { font-size: 22px; line-height: 1; padding: 0 1px; }
+.timer-labels { display: flex; gap: 9px; margin-top: 4px; font-size: 11px; font-weight: 500; color: #444; }
+.timer-block.warning .timer-digits { color: var(--flag-orange); }
+.timer-block.danger .timer-digits { color: var(--wrong-red); animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.hide-time-btn {
+  background: var(--jk-navy); color: #fff;
+  font-size: 11px; font-weight: 600;
+  border-radius: 50%; width: 46px; height: 46px;
+  display: inline-flex; align-items: center; justify-content: center;
+  text-align: center; line-height: 1.05; padding: 4px;
+  user-select: none; flex-shrink: 0;
+}
+.hide-time-btn:hover { background: var(--jk-navy-dark); }
+.center-cluster {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--header-bg); padding: 12px 32px;
+  gap: 14px; min-width: 320px; height: 56px;
+}
+.center-cluster .q-title { font-size: 18px; font-weight: 600; color: #1a1a1a; }
+.right-cluster { display: flex; justify-content: flex-end; align-items: center; padding-right: 8px; }
+.jk-logo { display: inline-flex; align-items: center; gap: 10px; user-select: none; }
+.jk-logo .mark {
+  width: 46px; height: 46px;
+  background: var(--jk-navy); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Lora', Georgia, serif; font-weight: 700; font-size: 22px;
+  letter-spacing: -1px; border-radius: 4px; position: relative;
+}
+.jk-logo .mark::after {
+  content: ""; position: absolute; bottom: 4px; right: 4px;
+  width: 8px; height: 8px; background: var(--jk-gold); border-radius: 50%;
+}
+.jk-logo .text { display: flex; flex-direction: column; line-height: 1.05; }
+.jk-logo .l1 { font-weight: 700; font-size: 14px; color: var(--jk-navy); letter-spacing: 0.5px; }
+.jk-logo .l2 { font-weight: 600; font-size: 9px; color: var(--jk-navy); letter-spacing: 1.2px; margin-top: 3px; }
+
+/* CONTENT */
+.content {
+  flex: 1; display: flex;
+  background: #ffffff;
+  overflow: hidden; position: relative;
+  min-height: 0;
+}
+.pane-left, .pane-right {
+  flex: 1; overflow-y: auto;
+  padding: 20px 28px 30px;
+  position: relative; min-height: 0;
+}
+.pane-left { border-right: 1px solid var(--border); }
+
+.instruction {
+  font-weight: 700;
+  margin-bottom: 14px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.passage-title {
+  font-family: 'Lora', Georgia, serif;
+  text-align: center;
+  font-weight: 600;
+  font-size: 22px;
+  margin: 8px 0 8px;
+  color: var(--jk-navy);
+}
+.passage-subtitle {
+  text-align: center;
+  font-style: italic;
+  color: #555;
+  font-size: 12.5px;
+  margin-bottom: 22px;
+}
+
+.passage-body {
+  font-size: 13.5px;
+  line-height: 1.85;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.passage-body p { margin-bottom: 18px; }
+
+/* Inline gap */
+.si-inline-gap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+  background: #fff;
+  border: 2px dashed var(--gap-blue);
+  border-radius: 3px;
+  padding: 4px 10px;
+  margin: 0 3px;
+  min-width: 200px;
+  min-height: 30px;
+  font-size: 12.5px;
+  color: #555;
+  font-style: italic;
+  transition: all 0.15s;
+}
+.si-inline-gap.drag-over {
+  background: #fef3c7;
+  border-color: var(--flag-orange);
+  border-style: solid;
+  transform: scale(1.02);
+}
+.si-inline-gap.filled {
+  background: #e0ebff;
+  border: 2px solid var(--jk-navy);
+  color: var(--jk-navy);
+  font-style: normal;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 200px;
+}
+.si-inline-gap .gap-label {
+  font-weight: 700;
+  color: var(--jk-navy);
+  background: rgba(0, 38, 100, 0.1);
+  padding: 2px 7px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-style: normal;
+  flex-shrink: 0;
+}
+.si-inline-gap.filled .gap-label { background: rgba(255,255,255,0.6); }
+.si-inline-gap .gap-content {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.si-inline-gap .gap-clear {
+  background: rgba(255,255,255,0.7);
+  color: #555;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.si-inline-gap .gap-clear:hover { background: var(--wrong-red); color: #fff; }
+
+/* OPTIONS (right) */
+.options-instruction {
+  font-weight: 700;
+  font-size: 13.5px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.drag-hint {
+  font-size: 12px;
+  color: #6b6b6b;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+.si-sentences-list { display: flex; flex-direction: column; gap: 10px; }
+.si-sentence {
+  border: 2px solid var(--gap-blue);
+  background: #fff;
+  border-radius: 4px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1a1a1a;
+  cursor: grab;
+  transition: all 0.12s;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  user-select: none;
+}
+.si-sentence:hover {
+  background: #f0f5ff;
+  border-color: var(--jk-navy);
+  box-shadow: 0 2px 6px rgba(0,38,100,0.12);
+}
+.si-sentence:active { cursor: grabbing; }
+.si-sentence.dragging { opacity: 0.4; cursor: grabbing; transform: scale(0.97); }
+.si-sentence.placed { opacity: 0.4; cursor: not-allowed; pointer-events: none; background: #f1f5f9; }
+.si-sentence .si-letter {
+  font-weight: 700; color: #fff;
+  background: var(--jk-navy);
+  border-radius: 3px;
+  padding: 3px 9px;
+  font-size: 13px;
+  flex-shrink: 0;
+  min-width: 26px;
+  text-align: center;
+}
+.si-sentence .si-text { flex: 1; font-weight: 500; }
+
+/* BOTTOM BAR */
+.bottom-bar {
+  display: flex; align-items: stretch;
+  height: 60px; flex-shrink: 0;
+  background: #ffffff;
+  border-top: 1px solid var(--border);
+}
+.bottom-bar .btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 600;
+  padding: 0 28px; gap: 10px; height: 100%;
+}
+.btn-back, .btn-submit {
+  background: var(--jk-navy); color: #fff;
+  min-width: 140px;
+}
+.btn-back:hover, .btn-submit:hover { background: var(--jk-navy-dark); }
+.btn-back { margin-right: auto; }
+.btn-submit { margin-left: auto; }
+
+/* COVER / NAME / MODAL / RESULTS / REVIEW (same patterns as summary) */
+.cover-screen {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  padding: 40px 20px; background: var(--bg-page);
+  overflow-y: auto; min-height: 0;
+}
+.cover-card {
+  background: #fff; border: 3px solid var(--jk-navy);
+  padding: 40px 48px; max-width: 600px; width: 100%;
+  text-align: center; border-radius: 4px;
+  box-shadow: 0 4px 24px rgba(0, 38, 100, 0.12);
+}
+.cover-card .brand-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 60px; height: 60px;
+  background: var(--jk-navy); color: #fff;
+  font-family: 'Lora', Georgia, serif; font-weight: 700;
+  font-size: 26px; border-radius: 6px;
+  margin: 0 auto 18px; position: relative;
+}
+.cover-card .brand-mark::after {
+  content: ""; position: absolute;
+  bottom: 5px; right: 5px;
+  width: 9px; height: 9px;
+  background: var(--jk-gold); border-radius: 50%;
+}
+.cover-card h1 {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 24px; font-weight: 600;
+  margin-bottom: 6px; color: var(--jk-navy);
+}
+.cover-card .subtitle { font-size: 14.5px; color: #555; margin-bottom: 26px; }
+.cover-card .question { font-size: 17px; font-weight: 600; margin-bottom: 14px; line-height: 1.4; }
+.cover-card .sub { font-size: 13px; margin-bottom: 26px; color: #555; line-height: 1.55; }
+.cover-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.cover-actions button {
+  background: var(--jk-navy); color: #fff;
+  font-size: 15px; font-weight: 600;
+  padding: 11px 32px; min-width: 120px;
+  border-radius: 3px; transition: background 0.12s;
+}
+.cover-actions button:hover { background: var(--jk-navy-dark); }
+.cover-actions button.secondary { background: #e5e8ec; color: #1a1a1a; }
+.cover-actions button.secondary:hover { background: #d8dde2; }
+.cover-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+.name-input {
+  width: 100%; font-size: 17px;
+  padding: 13px 14px; border: 2px solid var(--border);
+  border-radius: 3px; margin-bottom: 8px; text-align: center;
+}
+.name-input:focus { outline: none; border-color: var(--jk-navy); }
+.name-hint { font-size: 12.5px; color: #888; margin-bottom: 22px; }
+.back-link {
+  display: inline-block; margin-top: 18px;
+  font-size: 13px; color: var(--muted); text-decoration: none;
+}
+.back-link:hover { color: var(--jk-navy); }
+
+.modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; animation: fadeIn 0.2s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-card {
+  background: #fff; border: 3px solid var(--jk-navy);
+  padding: 30px 36px; max-width: 480px;
+  width: calc(100% - 40px); text-align: center;
+  border-radius: 4px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  animation: slideUp 0.25s ease-out;
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-card.warning { border-color: var(--flag-orange); }
+.modal-card h2 { font-size: 20px; margin-bottom: 12px; color: var(--jk-navy); }
+.modal-card.warning h2 { color: var(--flag-orange); }
+.modal-card p { margin-bottom: 20px; font-size: 14.5px; line-height: 1.55; }
+.modal-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.modal-actions button {
+  background: var(--jk-navy); color: #fff;
+  padding: 10px 26px; font-weight: 600; font-size: 14.5px;
+  min-width: 100px; border-radius: 3px;
+}
+.modal-actions button:hover { background: var(--jk-navy-dark); }
+.modal-actions button.secondary { background: #e5e8ec; color: #1a1a1a; }
+.modal-actions button.secondary:hover { background: #d8dde2; }
+
+.results-screen {
+  flex: 1; background: var(--bg-page);
+  padding: 30px 20px 60px;
+  overflow-y: auto; min-height: 0;
+}
+.results-card {
+  background: #fff; border: 3px solid var(--jk-navy);
+  border-radius: 6px; max-width: 720px;
+  margin: 0 auto; padding: 32px 36px; text-align: center;
+}
+.results-card h1 { font-family: 'Lora', Georgia, serif; font-size: 26px; margin-bottom: 6px; color: var(--jk-navy); }
+.results-card .student-line { font-size: 14px; color: #555; margin-bottom: 20px; }
+.score-display { display: flex; justify-content: center; align-items: baseline; gap: 14px; margin-bottom: 6px; }
+.score-display .score { font-size: 60px; font-weight: 700; color: var(--jk-navy); line-height: 1; }
+.score-display .total { font-size: 30px; color: #888; font-weight: 500; }
+.score-pct { font-size: 20px; font-weight: 600; color: var(--jk-gold); margin-bottom: 8px; }
+.score-time { font-size: 13px; color: #666; margin-bottom: 24px; }
+.results-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.results-actions button {
+  background: var(--jk-navy); color: #fff;
+  padding: 11px 22px; font-size: 14.5px; font-weight: 600;
+  border-radius: 3px; min-width: 130px;
+}
+.results-actions button:hover { background: var(--jk-navy-dark); }
+.results-actions button.secondary { background: #e5e8ec; color: #1a1a1a; }
+.results-actions button.secondary:hover { background: #d8dde2; }
+.upload-status { margin-top: 16px; font-size: 13px; color: #666; }
+.upload-status.success { color: var(--correct-green); }
+.upload-status.error { color: var(--wrong-red); }
+
+.review-banner {
+  background: var(--jk-navy); color: #fff;
+  padding: 12px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.review-banner .info { display: flex; gap: 18px; align-items: center; }
+.review-banner .badge {
+  background: rgba(255,255,255,0.18);
+  padding: 5px 12px; border-radius: 12px;
+  font-weight: 700; font-size: 12px;
+}
+.review-banner button {
+  background: rgba(255,255,255,0.18); color: #fff;
+  padding: 7px 14px; font-size: 13px; font-weight: 600;
+  border-radius: 3px; border: 1px solid rgba(255,255,255,0.35);
+}
+.review-banner button:hover { background: rgba(255,255,255,0.28); }
+
+.review-row {
+  background: #fff;
+  padding: 16px 20px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  border-left: 4px solid var(--jk-navy);
+}
+.review-row.correct { border-left-color: var(--correct-green); background: #f0fdf4; }
+.review-row.wrong { border-left-color: var(--wrong-red); background: #fef2f2; }
+.review-row .header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.review-row .gap-num {
+  font-weight: 700;
+  color: var(--jk-navy);
+  font-size: 14px;
+}
+.review-row .review-status {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 10px;
+  letter-spacing: 0.4px;
+}
+.review-row .review-status.correct { background: var(--correct-green); color: #fff; }
+.review-row .review-status.wrong { background: var(--wrong-red); color: #fff; }
+.review-row .answer-line { font-size: 13px; margin-bottom: 4px; line-height: 1.4; }
+.review-row .answer-line strong { font-weight: 700; }
+.review-row .user-ans { color: var(--wrong-red); }
+.review-row .correct-ans { color: var(--correct-green); }
+
+.solution-toggle-btn {
+  background: var(--jk-gold); color: #1a1a1a;
+  font-weight: 700; padding: 8px 14px;
+  font-size: 12.5px; border-radius: 3px;
+  margin-top: 8px;
+}
+.solution-toggle-btn:hover { background: #b89348; }
+.solution-panel {
+  margin-top: 10px;
+  background: #fffbeb;
+  border: 1px solid var(--jk-gold);
+  border-radius: 4px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.solution-panel h4 {
+  font-size: 11.5px; font-weight: 700;
+  color: var(--jk-navy); margin-bottom: 6px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.solution-panel .why-not strong { color: var(--wrong-red); }
+
+@media (max-width: 900px) {
+  .pane-left, .pane-right { padding: 16px 16px; }
+  .center-cluster { min-width: 200px; padding: 8px 14px; }
+  .center-cluster .q-title { font-size: 14px; }
+  .top-bar { height: 64px; }
+  .timer-digits .num { font-size: 20px; }
+  .jk-logo .text { display: none; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const GOOGLE_SHEETS_URL = '';
+
+const TEST_META = {
+  testId: 'TestDay-Cloze-ReadingAloud',
+  title: 'Sentence Insertion',
+  topic: 'The Power of Reading Aloud',
+  durationSeconds: 540,  // 9 minutes
+  totalQuestions: 6
+};
+
+const PASSAGE = {
+  title: 'The Power of Reading Aloud',
+  subtitle: 'Test-day morning paper — real-test calibration',
+  // Use {{N}} for gap markers
+  bodyHtml: `<p>For most of the past century, reading aloud was treated as a children's activity. Once a student could read silently, schools assumed the noisy stage was over. Researchers have arrived at a different account of what reading aloud does to the older brain.</p>
+<p>Reading aloud is not simply reading with the volume turned up. It forces the reader to slow down and notice patterns the eye can skim. {{15}} These quiet learning effects, produced by the steady use of the voice, deliver several gains schools spend money trying to engineer through software.</p>
+<p>Education researchers asking whether reading aloud produced effects on older students have produced surprising findings. Studies tracking thousands of students from Year 4 to Year 8 have produced consistent results, even after adjusting for income and prior achievement. {{16}} Such effects have moved reading aloud into the centre of literacy planning.</p>
+<p>{{17}} This paradox — a practice long dismissed as childish turning out to be essential to advanced reading — forced a reconsideration of how literacy had been taught. The same teachers who had treated silent reading as the marker of maturity were now reconsidering what had been lost.</p>
+<p>Bringing reading aloud back is not simple. Timetables have been built around silent reading for decades, and adolescent students feel embarrassed reading aloud in front of peers. The disagreement is sharpest in the upper-primary and early-secondary years. {{18}} These tensions mean the practice most needed is also the hardest to introduce.</p>
+<p>Where reform has succeeded, the success has depended on agreements between teachers, parents and students. The programs that have emerged share a common feature — they begin with small voluntary groups of older students before being extended to whole classes. {{19}} These programs have produced documented improvements that silent reading alone could not deliver.</p>
+<p>The most consequential change is institutional. The categories under which schools plan reading were built around the assumption that reading aloud was a stage that ended early. That assumption is now being formally revised. {{20}} This shift in classification moves reading aloud into the core literacy categories of every year level.</p>`,
+  gaps: [
+    { qNum: 15, correctLetter: 'C',
+      solution: { evidence: "After the gap: 'these quiet learning effects'. The gap needs the EFFECTS named first. C names three: vocabulary, comprehension, hearing how language sounds. 'It' anchors back to reading aloud.",
+        whyNot: "<strong>F</strong> describes a measured outcome (twelve percent score rise) — also tempting because it's about reading aloud. But 'these quiet learning effects' needs effects, not a measurement. F belongs at Gap 16, where 'such effects' needs the measured number." } },
+    { qNum: 16, correctLetter: 'F',
+      solution: { evidence: "After the gap: 'such effects' — needs a measured outcome. F gives the number (twelve percent rise in vocabulary scores).",
+        whyNot: "<strong>C</strong> also describes positive outcomes of reading aloud, which can tempt at Gap 16. But 'such effects' specifically needs a quantified study finding, not a list of mechanisms. C's effects are processes; F's effect is a measurement." } },
+    { qNum: 17, correctLetter: 'A',
+      solution: { evidence: "Gap 17 starts P4. After: 'this paradox' — needs a paradox. A IS a paradox: classrooms without reading aloud became MORE screen-dependent, not better readers. 'X but not Y' structure = paradox.",
+        whyNot: "<strong>E</strong> is also a researcher-realisation-style sentence and could feel like the start of P4. But E states a NEW CATEGORY, not a paradox. 'This paradox' needs a reversal of expectation. E belongs at Gap 20, where 'this shift in classification' needs a category statement." } },
+    { qNum: 18, correctLetter: 'G',
+      solution: { evidence: "P5 sets up the conflict ('older students feel embarrassed', 'upper-primary and early-secondary years'). The gap closes the paragraph before 'these tensions'. G names the specific outcome: proposals defeated where 'older students set the tone'. 'Older students' anchors back to the embarrassed adolescents.",
+        whyNot: "<strong>D</strong> ('Teachers run weekly reading sessions… students choose the books') is tempting because it mentions reading-aloud activity. But D describes a SUCCESS pattern. At Gap 18 the surrounding paragraph is about RESISTANCE, and the next sentence calls it 'these tensions'. Tensions need a defeat or a refusal, not a working program." } },
+    { qNum: 19, correctLetter: 'D',
+      solution: { evidence: "After the gap: 'these programs'. The gap needs the program activities named first. D names three: teacher reading sessions, parent volunteers, student book choice.",
+        whyNot: "<strong>G</strong> is about reading-aloud proposals at the school level too. But G describes proposals being DEFEATED — the wrong direction for P6, which is the success paragraph. The paragraph before the gap describes programs being EXTENDED to whole classes; G's defeated proposals contradict this." } },
+    { qNum: 20, correctLetter: 'E',
+      solution: { evidence: "After the gap: 'this shift in classification' — needs a stated reclassification. E is the reclassification: reading aloud as core literacy skill, not early-childhood stage. 'X rather than Y' structure = classification shift.",
+        whyNot: "<strong>A</strong> is also a researcher-realisation sentence. But A names a research finding (about screen-dependence), not a category change. 'This shift in classification' needs a category statement. E gives the new category; A gives a research result. A belongs at Gap 17 (the paradox)." } }
+  ]
+};
+
+const SENTENCES = [
+  { letter: 'A', text: 'Researchers gradually realised that classrooms without reading aloud had become more screen-dependent, not better readers.' },
+  { letter: 'B', text: "Schools now teach more than half of the world's children and continue to expand rapidly." },
+  { letter: 'C', text: 'It strengthens vocabulary, sharpens comprehension, and lets the reader hear how written language is meant to sound.' },
+  { letter: 'D', text: 'Teachers run weekly reading sessions, parents volunteer to listen, and students choose the books they read.' },
+  { letter: 'E', text: 'Reading aloud is increasingly classified as a core literacy skill rather than an early-childhood stage.' },
+  { letter: 'F', text: 'Vocabulary scores rose by roughly twelve percent in classrooms where students read aloud daily.' },
+  { letter: 'G', text: 'Proposals to introduce daily reading aloud are most often defeated in schools where older students set the tone.' }
+];
+const EXTRA_LETTER = 'B';
+const EXTRA_NOTE = "Sentence B (\"Schools now teach more than half of the world's children and continue to expand rapidly.\") is the unused option. It is a generic fact about world school populations — thematically about education, but a population statistic, not a feature of reading aloud. Every gap calls for a specific structural element (effects, measurement, paradox, defeat, programs, classification). B supplies none of these.";
+
+const STATE = {
+  screen: 'name',
+  studentName: '',
+  startedAt: null,
+  finishedAt: null,
+  timerSeconds: TEST_META.durationSeconds,
+  timerHidden: false,
+  // answers[gapNum] = letter
+  answers: {},
+  draggingSentence: null,
+  showSolution: {},
+  uploadStatus: 'pending'
+};
+
+let timerInterval = null;
+const root = document.getElementById('app');
+
+function render() {
+  switch (STATE.screen) {
+    case 'name': renderNameEntry(); break;
+    case 'confirm': renderConfirm(); break;
+    case 'test': renderTest(); break;
+    case 'submitConfirm': renderTest(); renderSubmitModal(); break;
+    case 'timeUp': renderTest(); renderTimeUpModal(); break;
+    case 'submitted': renderResults(); break;
+    case 'review': renderReview(); break;
+  }
+}
+
+function jkLogo() {
+  return `<div class="jk-logo">
+    <div class="mark">JK</div>
+    <div class="text">
+      <span class="l1">JK COACHING</span>
+      <span class="l2">COLLEGE</span>
+    </div>
+  </div>`;
+}
+
+function topBar() {
+  let timerCls = '';
+  if (STATE.timerSeconds <= 30) timerCls = 'danger';
+  else if (STATE.timerSeconds <= 120) timerCls = 'warning';
+  return `<div class="top-bar">
+    <div class="left-cluster">
+      <button class="zoom-btn" onclick="zoomToggle()">+</button>
+      <div class="timer-block ${timerCls}">
+        <div class="timer-digits" style="${STATE.timerHidden ? 'visibility:hidden' : ''}">${formatTimer()}</div>
+        ${STATE.timerHidden ? '' : `<div class="timer-labels"><span>Hours</span><span>Mins</span><span>Secs</span></div>`}
+      </div>
+      <button class="hide-time-btn" onclick="toggleHideTime()">${STATE.timerHidden ? 'Show time' : 'Hide time'}</button>
+    </div>
+    <div class="center-cluster"><span class="q-title">${TEST_META.title} · Q15–20</span></div>
+    <div class="right-cluster">${jkLogo()}</div>
+  </div>`;
+}
+
+function topBarSimple(text) {
+  return `<div class="top-bar">
+    <div class="left-cluster"><button class="zoom-btn">+</button></div>
+    <div class="center-cluster"><span class="q-title">${text}</span></div>
+    <div class="right-cluster">${jkLogo()}</div>
+  </div>`;
+}
+
+function renderNameEntry() {
+  root.innerHTML = `
+    ${topBarSimple(TEST_META.title + ' · ' + TEST_META.topic)}
+    <div class="cover-screen">
+      <div class="cover-card">
+        <div class="brand-mark">JK</div>
+        <h1>JK Coaching College</h1>
+        <div class="subtitle">${TEST_META.title} — ${TEST_META.topic}</div>
+        <div class="question">Please enter your name to begin</div>
+        <div class="sub">
+          You will have <strong>9 minutes</strong>.<br>
+          Six sentences have been removed from the text.
+          Drag each sentence (A–G) into the matching gap. One sentence is extra.
+        </div>
+        <input type="text" class="name-input" id="nameInput" placeholder="e.g. Sarah Kim"
+               value="${escapeHtml(STATE.studentName)}"
+               oninput="STATE.studentName = this.value; document.getElementById('startBtn').disabled = !this.value.trim();"
+               onkeypress="if(event.key === 'Enter' && this.value.trim()) goConfirm()">
+        <div class="name-hint">${TEST_META.totalQuestions} questions · 9 minutes</div>
+        <div class="cover-actions">
+          <button id="startBtn" ${STATE.studentName.trim() ? '' : 'disabled'} onclick="goConfirm()">Continue</button>
+        </div>
+        <a href="../" class="back-link">← Back to home</a>
+      </div>
+    </div>
+  `;
+  setTimeout(() => document.getElementById('nameInput')?.focus(), 50);
+}
+
+function renderConfirm() {
+  root.innerHTML = `
+    ${topBarSimple('')}
+    <div class="cover-screen">
+      <div class="cover-card">
+        <div class="brand-mark">JK</div>
+        <h1>${escapeHtml(STATE.studentName)}</h1>
+        <div class="subtitle">${TEST_META.title} — ${TEST_META.topic}</div>
+        <div class="question">Ready to begin?</div>
+        <div class="sub">The timer (9 minutes) will start when you click Yes.<br>When time runs out the test is submitted automatically.</div>
+        <div class="cover-actions">
+          <button class="secondary" onclick="STATE.screen='name'; render();">No, go back</button>
+          <button onclick="startTest()">Yes, start</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTest() {
+  const placedSet = new Set(Object.values(STATE.answers));
+
+  // Build passage with inline gaps
+  const bodyHtml = PASSAGE.bodyHtml.replace(/\{\{(\d+)\}\}/g, (_, gapNum) => {
+    const sIdx = STATE.answers[gapNum];
+    const filled = sIdx !== undefined && sIdx !== null;
+    if (filled) {
+      const sent = SENTENCES.find(s => s.letter === sIdx);
+      const previewShort = sent.text.length > 80 ? sent.text.slice(0, 80) + '…' : sent.text;
+      return `<span class="si-inline-gap filled"
+                    data-gap="${gapNum}"
+                    ondragover="gapDragOver(event, '${gapNum}')"
+                    ondragleave="gapDragLeave(event)"
+                    ondrop="gapDrop(event, '${gapNum}')">
+        <span class="gap-label">Q.${gapNum}</span>
+        <span class="gap-content"><strong>${sIdx}.</strong> ${escapeHtml(previewShort)}</span>
+        <span class="gap-clear" onclick="clearGap('${gapNum}'); event.stopPropagation();" title="Remove">✕</span>
+      </span>`;
+    }
+    return `<span class="si-inline-gap"
+                  data-gap="${gapNum}"
+                  ondragover="gapDragOver(event, '${gapNum}')"
+                  ondragleave="gapDragLeave(event)"
+                  ondrop="gapDrop(event, '${gapNum}')">
+      <span class="gap-label">Q.${gapNum}</span>
+      <span class="gap-content">______________________</span>
+    </span>`;
+  });
+
+  // Sentence cards
+  const sentencesHtml = SENTENCES.map(s => {
+    const placed = placedSet.has(s.letter);
+    return `<div class="si-sentence ${placed ? 'placed' : ''}"
+                  draggable="${placed ? 'false' : 'true'}"
+                  ondragstart="sentDragStart(event, '${s.letter}')"
+                  ondragend="sentDragEnd(event)">
+      <span class="si-letter">${s.letter}</span>
+      <span class="si-text">${escapeHtml(s.text)}</span>
+    </div>`;
+  }).join('');
+
+  root.innerHTML = `
+    ${topBar()}
+    <div class="content">
+      <div class="pane-left">
+        <div class="instruction">Read the text below. Six sentences have been removed from the text. Choose from the sentences (A – G) the one which fits each gap (15 – 20). There is one extra sentence which you do not need to use.</div>
+        <div class="passage-title">${PASSAGE.title}</div>
+        <div class="passage-subtitle">${PASSAGE.subtitle}</div>
+        <div class="passage-body">${bodyHtml}</div>
+      </div>
+      <div class="pane-right">
+        <div class="options-instruction">Sentences A – G</div>
+        <div class="drag-hint">Drag each sentence onto the gap (Q.15–Q.20) where it best fits.</div>
+        <div class="si-sentences-list">${sentencesHtml}</div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <button class="btn btn-back" onclick="goHome()">← Home</button>
+      <button class="btn btn-submit" onclick="goSubmit()">Submit ▸</button>
+    </div>
+  `;
+}
+
+function renderSubmitModal() {
+  const unanswered = PASSAGE.gaps.filter(g => !STATE.answers[g.qNum]).length;
+  const modal = document.createElement('div');
+  modal.className = 'modal-bg';
+  modal.id = 'submitModal';
+  modal.innerHTML = `
+    <div class="modal-card">
+      <h2>Submit your test?</h2>
+      <p>${unanswered > 0 ? `You have <strong>${unanswered}</strong> unanswered gap${unanswered > 1 ? 's' : ''}.` : 'You have answered all gaps.'}<br>
+      Once submitted, you cannot change your answers.</p>
+      <div class="modal-actions">
+        <button class="secondary" onclick="cancelSubmit()">Cancel</button>
+        <button onclick="finalizeSubmit()">Submit</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function renderTimeUpModal() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-bg';
+  modal.id = 'timeUpModal';
+  modal.innerHTML = `
+    <div class="modal-card warning">
+      <h2>⏰ Time's up!</h2>
+      <p>The 9 minutes are over. Your test will be submitted automatically.</p>
+      <div class="modal-actions">
+        <button onclick="finalizeSubmit()">View Results</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function renderResults() {
+  const score = computeScore();
+  const elapsed = Math.floor((STATE.finishedAt - STATE.startedAt) / 1000);
+  const min = Math.floor(elapsed / 60);
+  const sec = elapsed % 60;
+  const pct = Math.round((score.correct / score.total) * 100);
+
+  let uploadHtml = '';
+  if (STATE.uploadStatus === 'pending') uploadHtml = `<div class="upload-status">Saving results to teacher dashboard…</div>`;
+  else if (STATE.uploadStatus === 'success') uploadHtml = `<div class="upload-status success">✓ Results saved to teacher dashboard</div>`;
+  else if (STATE.uploadStatus === 'error') uploadHtml = `<div class="upload-status error">Could not save automatically. Please notify your teacher of your score.</div>`;
+
+  root.innerHTML = `
+    ${topBarSimple('Test Complete')}
+    <div class="results-screen">
+      <div class="results-card">
+        <h1>Well Done!</h1>
+        <div class="student-line"><strong>${escapeHtml(STATE.studentName)}</strong> · ${TEST_META.title} · ${TEST_META.topic}</div>
+        <div class="score-display">
+          <span class="score">${score.correct}</span>
+          <span class="total">/ ${score.total}</span>
+        </div>
+        <div class="score-pct">${pct}%</div>
+        <div class="score-time">Time taken: ${min}m ${sec}s</div>
+        <div class="results-actions">
+          <button onclick="goReview()">Review Answers</button>
+          <button class="secondary" onclick="restartTest()">Restart</button>
+          <button class="secondary" onclick="goHome()">Home</button>
+        </div>
+        ${uploadHtml}
+      </div>
+    </div>
+  `;
+}
+
+function renderReview() {
+  const reviewRows = PASSAGE.gaps.map(g => {
+    const userAns = STATE.answers[g.qNum];
+    const correctAns = g.correctLetter;
+    const isCorrect = userAns === correctAns;
+    const correctSent = SENTENCES.find(s => s.letter === correctAns);
+    const userSent = userAns ? SENTENCES.find(s => s.letter === userAns) : null;
+
+    let statusBadge, rowCls;
+    if (!userAns) {
+      statusBadge = `<span class="review-status wrong">NOT ANSWERED</span>`;
+      rowCls = 'wrong';
+    } else if (isCorrect) {
+      statusBadge = `<span class="review-status correct">✓ CORRECT</span>`;
+      rowCls = 'correct';
+    } else {
+      statusBadge = `<span class="review-status wrong">✕ INCORRECT</span>`;
+      rowCls = 'wrong';
+    }
+
+    const isOpen = STATE.showSolution[g.qNum];
+    return `
+      <div class="review-row ${rowCls}">
+        <div class="header">
+          <span class="gap-num">Q${g.qNum}</span>
+          ${statusBadge}
+        </div>
+        ${userAns && !isCorrect ? `<div class="answer-line user-ans"><strong>Your answer (${userAns}):</strong> ${escapeHtml(userSent.text)}</div>` : ''}
+        <div class="answer-line correct-ans"><strong>Correct answer (${correctAns}):</strong> ${escapeHtml(correctSent.text)}</div>
+        <button class="solution-toggle-btn" onclick="toggleSolution(${g.qNum})">
+          ${isOpen ? '▲ Hide solution' : '💡 Show solution'}
+        </button>
+        ${isOpen ? `<div class="solution-panel">
+          <h4>Why this is correct</h4>
+          <div>${g.solution.evidence}</div>
+          <h4 style="margin-top: 10px;">Why not the others</h4>
+          <div class="why-not">${g.solution.whyNot}</div>
+        </div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  const score = computeScore();
+
+  root.innerHTML = `
+    <div class="review-banner">
+      <div class="info">
+        <span>Reviewing</span>
+        <span class="badge">${score.correct} / ${score.total}</span>
+      </div>
+      <div><button onclick="exitReview()">← Back to Results</button></div>
+    </div>
+    <div class="content" style="display: block; overflow-y: auto;">
+      <div style="padding: 24px 32px; max-width: 920px; margin: 0 auto;">
+        <h1 style="font-family: 'Lora', Georgia, serif; font-size: 24px; color: var(--jk-navy); text-align: center; margin-bottom: 18px;">${PASSAGE.title}</h1>
+        ${reviewRows}
+        <div class="review-row" style="border-left-color: var(--jk-gold); margin-top: 24px;">
+          <div class="header"><span class="gap-num">Note: Unused option</span></div>
+          <div class="solution-panel"><p>${EXTRA_NOTE}</p></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* DRAG & DROP */
+function sentDragStart(ev, letter) {
+  STATE.draggingSentence = letter;
+  ev.dataTransfer.effectAllowed = 'move';
+  try { ev.dataTransfer.setData('text/plain', letter); } catch (_) {}
+  ev.currentTarget.classList.add('dragging');
+}
+function sentDragEnd(ev) {
+  ev.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.si-inline-gap.drag-over').forEach(el => el.classList.remove('drag-over'));
+}
+function gapDragOver(ev, gapNum) {
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = 'move';
+  ev.currentTarget.classList.add('drag-over');
+}
+function gapDragLeave(ev) {
+  ev.currentTarget.classList.remove('drag-over');
+}
+function gapDrop(ev, gapNum) {
+  ev.preventDefault();
+  ev.currentTarget.classList.remove('drag-over');
+  let letter = STATE.draggingSentence;
+  if (!letter) {
+    const txt = ev.dataTransfer.getData('text/plain');
+    if (txt) letter = txt;
+  }
+  if (!letter) return;
+  Object.keys(STATE.answers).forEach(k => {
+    if (STATE.answers[k] === letter) delete STATE.answers[k];
+  });
+  STATE.answers[gapNum] = letter;
+  STATE.draggingSentence = null;
+  render();
+}
+function clearGap(gapNum) {
+  delete STATE.answers[gapNum];
+  render();
+}
+
+/* NAV & TIMER */
+function goConfirm() { if (!STATE.studentName.trim()) return; STATE.screen = 'confirm'; render(); }
+function startTest() {
+  STATE.screen = 'test';
+  STATE.startedAt = Date.now();
+  startTimer();
+  render();
+}
+function goSubmit() { STATE.screen = 'submitConfirm'; render(); }
+function cancelSubmit() {
+  STATE.screen = 'test';
+  document.getElementById('submitModal')?.remove();
+}
+function finalizeSubmit() {
+  stopTimer();
+  STATE.finishedAt = Date.now();
+  STATE.screen = 'submitted';
+  document.getElementById('submitModal')?.remove();
+  document.getElementById('timeUpModal')?.remove();
+  uploadResults();
+  render();
+}
+function goReview() { STATE.screen = 'review'; render(); }
+function exitReview() { STATE.screen = 'submitted'; render(); }
+function toggleSolution(qNum) {
+  STATE.showSolution[qNum] = !STATE.showSolution[qNum];
+  render();
+}
+function restartTest() {
+  if (!confirm('Restart the test? All answers will be cleared.')) return;
+  STATE.screen = 'name';
+  STATE.studentName = '';
+  STATE.timerSeconds = TEST_META.durationSeconds;
+  STATE.timerHidden = false;
+  STATE.answers = {};
+  STATE.draggingSentence = null;
+  STATE.showSolution = {};
+  STATE.uploadStatus = 'pending';
+  STATE.startedAt = null;
+  STATE.finishedAt = null;
+  stopTimer();
+  render();
+}
+function goHome() {
+  if (STATE.screen === 'test' && Object.keys(STATE.answers).length > 0) {
+    if (!confirm('Leave the test? Your progress will be lost.')) return;
+  }
+  window.location.href = '../';
+}
+
+function startTimer() {
+  stopTimer();
+  timerInterval = setInterval(() => {
+    STATE.timerSeconds--;
+    if (STATE.timerSeconds <= 0) {
+      stopTimer();
+      STATE.timerSeconds = 0;
+      STATE.screen = 'timeUp';
+      render();
+      return;
+    }
+    updateTimerDisplay();
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+function updateTimerDisplay() {
+  const el = document.querySelector('.timer-digits');
+  if (el) el.innerHTML = formatTimer();
+  const block = document.querySelector('.timer-block');
+  if (block) {
+    block.classList.remove('warning', 'danger');
+    if (STATE.timerSeconds <= 30) block.classList.add('danger');
+    else if (STATE.timerSeconds <= 120) block.classList.add('warning');
+  }
+}
+function formatTimer() {
+  const h = Math.floor(STATE.timerSeconds / 3600);
+  const m = Math.floor((STATE.timerSeconds % 3600) / 60);
+  const s = STATE.timerSeconds % 60;
+  const pad = n => String(n).padStart(2, '0');
+  return `<span class="num">${pad(h)}</span><span class="colon">:</span><span class="num">${pad(m)}</span><span class="colon">:</span><span class="num">${pad(s)}</span>`;
+}
+function toggleHideTime() { STATE.timerHidden = !STATE.timerHidden; render(); }
+function zoomToggle() {
+  const cur = parseFloat(document.body.style.zoom || '1');
+  document.body.style.zoom = cur >= 1.2 ? '1' : (cur + 0.1).toFixed(1);
+}
+
+function computeScore() {
+  let correct = 0;
+  PASSAGE.gaps.forEach(g => { if (STATE.answers[g.qNum] === g.correctLetter) correct++; });
+  return { correct, total: PASSAGE.gaps.length };
+}
+
+function uploadResults() {
+  if (!GOOGLE_SHEETS_URL) {
+    STATE.uploadStatus = 'disabled';
+    return;
+  }
+  const score = computeScore();
+  const elapsed = Math.floor((STATE.finishedAt - STATE.startedAt) / 1000);
+  const answersStr = PASSAGE.gaps.map(g => {
+    const u = STATE.answers[g.qNum] || '-';
+    return `Q${g.qNum}:${u}(${g.correctLetter})`;
+  }).join(' | ');
+
+  const payload = {
+    studentName: STATE.studentName,
+    setName: TEST_META.testId,
+    timestamp: new Date().toISOString(),
+    timestampLocal: new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' }),
+    totalScore: score.correct,
+    totalPossible: score.total,
+    percentage: Math.round((score.correct / score.total) * 100),
+    timeTakenSeconds: elapsed,
+    timeTakenFormatted: `${Math.floor(elapsed/60)}m ${elapsed%60}s`,
+    sectionA: '-', sectionB: '-', sectionC: '-', sectionD: '-', sectionE: '-',
+    answers: answersStr
+  };
+
+  STATE.uploadStatus = 'pending';
+  render();
+
+  fetch(GOOGLE_SHEETS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    STATE.uploadStatus = 'success';
+    if (STATE.screen === 'submitted') render();
+  }).catch(() => {
+    STATE.uploadStatus = 'error';
+    if (STATE.screen === 'submitted') render();
+  });
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"
+  }[c]));
+}
+
+render();
+</script>
+</body>
+</html>
