@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Multiple Extracts — Fashion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --jk-navy: #002664;
+  --jk-navy-dark: #001a47;
+  --jk-gold: #c9a55c;
+  --bg-page: #d6d8db;
+  --header-bg: #e7ecf2;
+  --border: #c7c7c7;
+  --text: #1a1a1a;
+  --muted: #6b6b6b;
+  --correct-green: #15803d;
+  --wrong-red: #b91c1c;
+  --flag-orange: #d97706;
+}
+html, body {
+  height: 100%;
+  font-family: 'Public Sans', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  color: var(--text);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input { font-family: inherit; }
+
+#app { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+.top-bar {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  height: 76px; padding: 0 14px; flex-shrink: 0; gap: 12px;
+}
+.left-cluster { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.zoom-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--jk-navy); color: white; font-size: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.zoom-btn:hover { background: var(--jk-navy-dark); }
+.timer-block { display: flex; align-items: flex-start; gap: 8px; }
+.timer-digits { display: flex; align-items: baseline; font-weight: 700; font-variant-numeric: tabular-nums; }
+.timer-digits .num { font-size: 26px; line-height: 1; }
+.timer-digits .colon { font-size: 22px; line-height: 1; padding: 0 1px; }
+.timer-labels { display: flex; gap: 9px; margin-top: 4px; font-size: 11px; font-weight: 500; color: #444; }
+.timer-block.warning .timer-digits { color: var(--flag-orange); }
+.timer-block.danger .timer-digits { color: var(--wrong-red); animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.hide-time-btn {
+  background: var(--jk-navy); color: #fff;
+  font-size: 11px; font-weight: 600;
+  border-radius: 50%; width: 46px; height: 46px;
+  display: inline-flex; align-items: center; justify-content: center;
+  text-align: center; line-height: 1.05; padding: 4px;
+  user-select: none; flex-shrink: 0;
+}
+.hide-time-btn:hover { background: var(--jk-navy-dark); }
+.center-cluster {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--header-bg); padding: 12px 32px;
+  gap: 14px; min-width: 320px; height: 56px;
+}
+.center-cluster .q-title { font-size: 18px; font-weight: 600; color: #1a1a1a; }
+.right-cluster { display: flex; justify-content: flex-end; align-items: center; padding-right: 8px; }
+.jk-logo { display: inline-flex; align-items: center; gap: 10px; user-select: none; }
+.jk-logo .mark {
+  width: 46px; height: 46px;
+  background: var(--jk-navy); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Lora', Georgia, serif; font-weight: 700; font-size: 22px;
+  letter-spacing: -1px; border-radius: 4px; position: relative;
+}
+.jk-logo .mark::after {
+  content: ""; position: absolute; bottom: 4px; right: 4px;
+  width: 8px; height: 8px; background: var(--jk-gold); border-radius: 50%;
+}
+.jk-logo .text { display: flex; flex-direction: column; line-height: 1.05; }
+.jk-logo .l1 { font-weight: 700; font-size: 15.5px; color: var(--jk-navy); letter-spacing: 0.5px; }
+.jk-logo .l2 { font-weight: 600; font-size: 9px; color: var(--jk-navy); letter-spacing: 1.2px; margin-top: 3px; }
+
+.content {
+  flex: 1; display: flex;
+  background: #ffffff;
+  overflow: hidden; position: relative;
+  min-height: 0;
+}
+.pane-left, .pane-right {
+  flex: 1; overflow-y: auto;
+  padding: 20px 28px 30px;
+  position: relative; min-height: 0;
+}
+.pane-left { border-right: 1px solid var(--border); }
+
+/* Extract tabs */
+.extract-tabs {
+  display: flex; gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.extract-tab {
+  padding: 8px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  background: transparent;
+  position: relative;
+  top: 1px;
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+.extract-tab.active {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-bottom: 1px solid #ffffff;
+  color: var(--jk-navy);
+}
+.extract-tab:not(.active):hover { background: #f4f6f8; }
+
+.extract-instruction-OLD {
+  font-weight: 700;
+  margin-bottom: 12px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.extract-content { font-size: 17px; line-height: 1.6; }
+.extract-content p { margin: 0 0 14px; }
+.extract-content p:last-child { margin-bottom: 0; }
+.extract-content .extract-label {
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 8px;
+  display: block;
+  color: var(--jk-navy);
+}
+
+/* Right pane: statements */
+.em-instruction {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.em-instruction.bold {
+  font-weight: 700;
+  margin-top: 8px;
+  margin-bottom: 14px;
+  font-size: 17px;
+}
+.em-statements { display: flex; flex-direction: column; }
+.em-statement-row {
+  display: grid;
+  grid-template-columns: 30px 1fr 90px;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+.em-statement-row:last-child { border-bottom: none; }
+.em-statement-num {
+  font-weight: 700;
+  color: var(--jk-navy);
+  padding-top: 8px;
+  font-size: 16px;
+}
+.em-statement-text {
+  font-size: 16px;
+  line-height: 1.45;
+  padding-top: 4px;
+}
+.em-select { position: relative; }
+.em-select select {
+  font-family: inherit;
+  font-size: 16px;
+  padding: 7px 28px 7px 12px;
+  border: 1.5px solid #5a5a5a;
+  border-radius: 2px;
+  background: #fff;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 34px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.em-select::after {
+  content: "";
+  position: absolute;
+  right: 10px; top: 50%;
+  transform: translateY(-25%);
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--jk-navy);
+  pointer-events: none;
+}
+
+/* BOTTOM BAR */
+.bottom-bar {
+  display: flex; align-items: stretch;
+  height: 60px; flex-shrink: 0;
+  background: #ffffff;
+  border-top: 1px solid var(--border);
+}
+.bottom-bar .btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 600;
+  padding: 0 28px; gap: 10px; height: 100%;
+}
+.btn-back, .btn-submit {
+  background: var(--jk-navy); color: #fff;
+  min-width: 140px;
+}
+.btn-back:hover, .btn-submit:hover { background: var(--jk-navy-dark); }
+.btn-back { margin-right: auto; }
+.btn-submit { margin-left: auto; }
+
+/* COVER / NAME / MODAL / RESULTS */
+.cover-screen {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  padding: 40px 20px; background: var(--bg-page);
+  overflow-y: auto; min-height: 0;
+}
+.cover-card {
+  background: #fff; border: 3px solid var(--jk-navy);
+  padding: 40px 48px; max-width: 600px; width: 100%;
+  text-align: center; border-radius: 4px;
+  box-shadow: 0 4px 24px rgba(0, 38, 100, 0.12);
+}
+.cover-card .brand-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 60px; height: 60px;
+  background: var(--jk-navy); color: #fff;
+  font-family: 'Lora', Georgia, serif; font-weight: 700;
+  font-size: 26px; border-radius: 6px;
+  margin: 0 auto 18px; position: relative;
+}
+.cover-card .brand-mark::after {
+  content: ""; position: absolute;
+  bottom: 5px; right: 5px;
+  width: 9px; height: 9px;
+  background: var(--jk-gold); border-radius: 50%;
+}
+.cover-card h1 {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 24px; font-weight: 600;
+  margin-bottom: 6px; color: var(--jk-navy);
+}
+.cover-card .subtitle { font-size: 16px; color: #555; margin-bottom: 26px; }
+.cover-card .question { font-size: 17px; font-weight: 600; margin-bottom: 14px; line-height: 1.4; }
+.cover-card .sub { font-size: 14.5px; margin-bottom: 26px; color: #555; line-height: 1.55; }
+.cover-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.cover-actions button {
+  background: var(--jk-navy); color: #fff;
+  font-size: 16px; font-weight: 600;
+  padding: 11px 32px; min-width: 120px;
+  border-radius: 3px; transition: background 0.12s;
+}
+.cover-actions button:hover { background: var(--jk-navy-dark); }
+.cover-actions button.secondary { background: #e5e8ec; color: #1a1a1a; }
+.cover-actions button.secondary:hover { background: #d8dde2; }
+.cover-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+.name-input {
+  width: 100%; font-size: 17px;
+  padding: 13px 14px; border: 2px solid var(--border);
+  border-radius: 3px; margin-bottom: 8px; text-align: center;
+}
+.name-input:focus { outline: none; border-color: var(--jk-navy); }
+.name-hint { font-size: 14px; color: #888; margin-bottom: 22px; }
+.back-link {
+  display: inline-block; margin-top: 18px;
+  font-size: 14.5px; color: var(--muted); text-decoration: none;
+}
+.back-link:hover { color: var(--jk-navy); }
+
+.modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; animation: fadeIn 0.2s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-card {
+  background: #fff; border: 3px solid var(--jk-navy);
+  padding: 30px 36px; max-width: 480px;
+  width: calc(100% - 40px); text-align: center;
+  border-radius: 4px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  animation: slideUp 0.25s ease-out;
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-card.warning { border-color: var(--flag-orange); }
+.modal-card h2 { font-size: 20px; margin-bottom: 12px; color: var(--jk-navy); }
+.modal-card.warning h2 { color: var(--flag-orange); }
+.modal-card p { margin-bottom: 20px; font-size: 16px; line-height: 1.55; }
+.modal-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.modal-actions button {
+  background: var(--jk-navy); color: #fff;
+  padding: 10px 26px; font-weight: 600; font-size: 16px;
+  min-width: 100px; border-radius: 3px;
+}
+.modal-actions button:hover { background: var(--jk-navy-dark); }
+.modal-actions button.secondary { background: #e5e8ec; color: #1a1a1a; }
+.modal-actions button.secondary:hover { background: #d8dde2; }
+
+.results-screen {
+  flex: 1; background: var(--bg-page);
+  padding: 30px 20px 60px;
+  overflow-y: auto; min-height: 0;
+}
+.results-card {
+  background: #fff; border: 3px solid var(--jk-navy);
+  border-radius: 6px; max-width: 720px;
+  margin: 0 auto; padding: 32px 36px; text-align: center;
+}
+.results-card h1 { font-family: 'Lora', Georgia, serif; font-size: 26px; margin-bottom: 6px; color: var(--jk-navy); }
+.results-card .student-line { font-size: 15.5px; color: #555; margin-bottom: 20px; }
+.score-display { display: flex; justify-content: center; align-items: baseline; gap: 14px; margin-bottom: 6px; }
+.score-display .score { font-size: 60px; font-weight: 700; color: var(--jk-navy); line-height: 1; }
+.score-display .total { font-size: 30px; color: #888; font-weight: 500; }
+.score-pct { font-size: 20px; font-weight: 600; color: var(--jk-gold); margin-bottom: 8px; }
+.score-time { font-size: 14.5px; color: #666; margin-bottom: 24px; }
+.results-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.results-actions button {
+  background: var(--jk-navy); color: #fff;
+  padding: 11px 22px; font-size: 16px; font-weight: 600;
+  border-radius: 3px; min-width: 130px;
+}
+.results-actions button:hover { background: var(--jk-navy-dark); }
+.results-actions button.secondary { background: #e5e8ec; color: #1a1a1a; }
+.results-actions button.secondary:hover { background: #d8dde2; }
+.upload-status { margin-top: 16px; font-size: 14.5px; color: #666; }
+.upload-status.success { color: var(--correct-green); }
+.upload-status.error { color: var(--wrong-red); }
+
+.review-banner {
+  background: var(--jk-navy); color: #fff;
+  padding: 12px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 15.5px; flex-shrink: 0;
+}
+.review-banner .info { display: flex; gap: 18px; align-items: center; }
+.review-banner .badge {
+  background: rgba(255,255,255,0.18);
+  padding: 5px 12px; border-radius: 12px;
+  font-weight: 700; font-size: 13.5px;
+}
+.review-banner button {
+  background: rgba(255,255,255,0.18); color: #fff;
+  padding: 7px 14px; font-size: 14.5px; font-weight: 600;
+  border-radius: 3px; border: 1px solid rgba(255,255,255,0.35);
+}
+.review-banner button:hover { background: rgba(255,255,255,0.28); }
+
+/* Review row coloring */
+.em-statement-row.review-correct {
+  background: #f0fdf4;
+  border-left: 4px solid var(--correct-green);
+  padding-left: 8px;
+}
+.em-statement-row.review-wrong {
+  background: #fef2f2;
+  border-left: 4px solid var(--wrong-red);
+  padding-left: 8px;
+}
+.em-statement-row.review-unanswered {
+  background: #f9fafb;
+  border-left: 4px solid #9ca3af;
+  padding-left: 8px;
+}
+.review-status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+  margin-top: 6px;
+  display: inline-block;
+}
+.review-status-badge.correct { background: var(--correct-green); color: #fff; }
+.review-status-badge.wrong { background: var(--wrong-red); color: #fff; }
+.review-status-badge.unanswered { background: #6b7280; color: #fff; }
+.em-correct-display {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--correct-green);
+  margin-top: 4px;
+  text-align: right;
+}
+.em-correct-display .label-arrow { color: #6b7280; font-weight: 500; }
+
+.solution-toggle-btn {
+  background: var(--jk-gold); color: #1a1a1a;
+  font-weight: 700; padding: 7px 12px;
+  font-size: 13.5px; border-radius: 3px;
+  margin-top: 6px;
+}
+.solution-toggle-btn:hover { background: #b89348; }
+.solution-panel {
+  margin-top: 8px;
+  background: #fffbeb;
+  border: 1px solid var(--jk-gold);
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 1.55;
+  grid-column: 1 / -1;
+}
+.solution-panel h4 {
+  font-size: 11px; font-weight: 700;
+  color: var(--jk-navy); margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.solution-panel .why-not strong { color: var(--wrong-red); }
+
+@media (max-width: 900px) {
+  .pane-left, .pane-right { padding: 16px 16px; }
+  .center-cluster { min-width: 200px; padding: 8px 14px; }
+  .center-cluster .q-title { font-size: 15.5px; }
+  .top-bar { height: 64px; }
+  .timer-digits .num { font-size: 20px; }
+  .jk-logo .text { display: none; }
+  .em-statement-row { grid-template-columns: 24px 1fr 80px; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const GOOGLE_SHEETS_URL = '';
+
+const TEST_META = {
+  testId: 'TestDay-Extract-Fashion',
+  title: 'Multiple Extracts',
+  topic: 'Fashion',
+  durationSeconds: 780,  // 13 minutes
+  totalQuestions: 10
+};
+
+const PASSAGE = {
+  theme: 'fashion',
+  extracts: [
+    {
+      letter: 'A',
+      label: 'Extract A',
+      html: `<span class="extract-label">Extract A</span>
+<p>My mother died at sixty-eight, and three months later my brother and I spent a Saturday afternoon in her bedroom, working through the wardrobe she had used for forty years. Most of what was in it was what one would expect — sensible work clothes, two pairs of black trousers in different sizes, a long winter coat she had worn for so many years that the lining had begun to come away from the wool. We packed those things into bags for the charity shop. Three things stopped us.</p>
+<p>The first was a yellow cotton dress, very seventies, folded carefully at the back of a high shelf. I had never seen my mother in it, and there was nothing else like it in the wardrobe. My brother found a photograph in a shoe-box on the same shelf — our mother at twenty-four, on a small stage with three other young women, holding a microphone, wearing the dress. We had not known she had sung in a band. She had not, in any of our childhoods, mentioned it once.</p>
+<p>The second was a silk scarf, blue and grey, wrapped around an old envelope. The third was a navy blue coat, bought from a shop in the city, that still had the price tag attached. The receipt was folded in the pocket. It had been bought, we worked out, for a wedding she had been invited to three years earlier and had, in the end, not attended.</p>`
+    },
+    {
+      letter: 'B',
+      label: 'Extract B',
+      html: `<span class="extract-label">Extract B</span>
+<p>Sana had thought about the coat for almost a month before she bought it. It was a particular wool, a particular cut, and it cost six hundred pounds — significantly more than she had ever spent on a single piece of clothing. She had tried it on in the shop three times across three weekends. Each time she had stood in front of the long mirror in the changing room and felt, with a clarity she did not often feel, that the coat was right. The fourth Saturday, she bought it.</p>
+<p>Something happened, however, between the shop and her front door. By the time she had carried the bag up the three flights to her flat and unpacked the coat onto her bed, the certainty had gone. The coat looked, on the bed in her own bedroom, slightly different from the coat in the shop. She tried it on again in front of her bathroom mirror. The garment was perfectly well made. Her own face above the collar was somehow not the face she had been buying it for.</p>
+<p>The coat hung in her wardrobe for the next two years. She wore it twice indoors, both times on hangers-on of an idea she could no longer recover. Eventually she gave it to a charity shop a few streets from where she lived. The coat had been the answer to a question she had stopped being able to ask.</p>`
+    },
+    {
+      letter: 'C',
+      label: 'Extract C',
+      html: `<span class="extract-label">Extract C</span>
+<p>A single cotton t-shirt, by the time it arrives in a high-street shop window in London or Sydney, has consumed approximately two thousand seven hundred litres of water in its production — most of it in the cotton-growing regions of central Asia, where intensive irrigation is steadily depleting the lakes and rivers the surrounding agriculture also depends on. The price displayed beside that t-shirt — increasingly, in fast-fashion retailers, somewhere between four and eight pounds — does not reflect this. It cannot. The water has not been paid for in any market the consumer has access to.</p>
+<p>The pattern repeats throughout the supply chain. Garment workers in the Bangladeshi factories that supply many of the major Western fast-fashion brands earn, on average, around forty US cents per hour. Industry studies estimate that paying these workers a living wage would add somewhere between fifteen and twenty pence to the cost of a finished t-shirt. The chain has chosen, instead, not to add it. The four-pound shirt is, in this strict sense, subsidised — by the river that gave its water without compensation, by the worker whose hours have not been fully paid for, and by the future climate that will absorb the cost of producing each piece quickly enough to keep up with the season's trends.</p>`
+    },
+    {
+      letter: 'D',
+      label: 'Extract D',
+      html: `<span class="extract-label">Extract D</span>
+<p>There is a particular pose, common in conversations about clothing, in which a person announces that they 'do not really care about fashion.' This is, on its face, a statement about indifference. What it actually is, on closer inspection, is a clothing position. The plain shirts, the considered shoes, the absence of branded items — these are not the absence of style. They are a particular style, communicating, with reasonable accuracy, the kind of person the speaker would like to be taken for.</p>
+<p>The unavoidable feature of dress, that the late French sociologist Pierre Bourdieu spent much of his career analysing, is that it always communicates. The communication does not stop because the wearer would prefer it to. Other people read clothes the way they read accents — quickly, often unconsciously, and with surprising accuracy. What we wear is taken to be a kind of statement we are making about ourselves: about where we have come from, where we believe ourselves to be going, what we expect to be respected for.</p>
+<p>Bourdieu's deeper finding, drawn from a vast survey of taste in 1960s France, was that what reads as personal style is largely the visible expression of social class. The clothes that appear, to a particular observer, as obviously well-chosen are well-chosen by the standards that observer learned in their own upbringing. Taste, in this sense, is not free. It is the inheritance of where one started — readable, by other people, almost as quickly as it is worn.</p>`
+    }
+  ]
+};
+
+const STATEMENTS = [
+  { qNum: 21, text: 'explains how cheap clothes carry costs not shown on the label?', correct: 'C',
+    solution: { evidence: "Extract C states that 'the price displayed beside that t-shirt... does not reflect' the 2,700 litres of water used in production. The four-pound shirt is 'subsidised — by the river that gave its water without compensation, by the worker whose hours have not been fully paid for, and by the future climate.' Cheap clothes carry costs the price tag does not show.",
+      whyNot: "<strong>D</strong> discusses what clothes communicate as social signals but offers no environmental or labour cost analysis. The stem 'costs not shown on label' anchors uniquely in C's water + wage + climate accounting." } },
+  { qNum: 22, text: 'describes finding garments that disclosed something unknown about a parent?', correct: 'A',
+    solution: { evidence: "Extract A: the writer finds the yellow dress and a photograph showing the mother 'at twenty-four, on a small stage with three other young women, holding a microphone, wearing the dress. We had not known she had sung in a band.' The garment disclosed something unknown about the parent.",
+      whyNot: "<strong>D</strong> discusses how clothes communicate but offers no parent-discovery scene. The stem 'garments disclosed something unknown about a parent' anchors uniquely in A's wardrobe scene." } },
+  { qNum: 23, text: 'argues that what we wear is read as a signal regardless of intent?', correct: 'D',
+    solution: { evidence: "Extract D states that 'the unavoidable feature of dress... is that it always communicates. The communication does not stop because the wearer would prefer it to.' Even those who claim not to care about fashion are sending a fashion signal. Clothes are read regardless of the wearer's intent.",
+      whyNot: "<strong>C</strong> discusses clothing's hidden costs but offers no claim about clothing as a social signal. The stem 'read as a signal regardless of intent' anchors uniquely in D's communicative-clothing argument." } },
+  { qNum: 24, text: 'depicts a person feeling differently about an item shortly after acquiring it?', correct: 'B',
+    solution: { evidence: "Extract B: 'something happened, however, between the shop and her front door. By the time she had carried the bag up the three flights to her flat and unpacked the coat onto her bed, the certainty had gone.' Sana felt differently about the coat almost immediately after buying it.",
+      whyNot: "<strong>A</strong> describes finding clothing in a wardrobe but no recent purchase changing in feeling. The stem 'feeling differently shortly after acquiring' anchors uniquely in B's between-shop-and-home shift." } },
+  { qNum: 25, text: 'explains why a low ticket price obscures what production has used up?', correct: 'C',
+    solution: { evidence: "Extract C explains that paying workers a living wage would add 15-20 pence to a t-shirt — but the chain has 'chosen, instead, not to add it.' The four-pound price 'does not reflect' the water, labour, and climate costs of production. The low price obscures what was actually used up making the item.",
+      whyNot: "<strong>D</strong> discusses clothing as a social-class signal but offers no claim about hidden production costs. The stem 'low ticket price obscures... production used up' anchors uniquely in C." } },
+  { qNum: 26, text: 'depicts uncovering an earlier life through belongings still kept?', correct: 'A',
+    solution: { evidence: "Extract A synthesises across four locations: (i) the yellow dress at the back of the high shelf; (ii) the photograph showing the mother on a stage at twenty-four; (iii) 'we had not known she had sung in a band'; (iv) the silk scarf and the unworn coat. Each item revealed a chapter of the mother's life the children had not known.",
+      whyNot: "<strong>B</strong>'s coat is Sana's own purchase, not a discovery of someone else's earlier life. The stem 'uncovering an earlier life through belongings still kept' anchors in A's three-item discovery of the mother's past." } },
+  { qNum: 27, text: "shows the gap between a thing's promise and its actual use?", correct: 'B',
+    solution: { evidence: "Extract B: 'the coat had been the answer to a question she had stopped being able to ask.' The coat had promised — at the moment of purchase — to be something she needed. In actual use, it hung in the wardrobe for two years and was worn twice indoors. The gap between the coat's promise and what it became was complete.",
+      whyNot: "<strong>A</strong> describes an unworn coat too, but A's coat is the mother's, bought for a specific cancelled occasion. The 'promise vs use' gap is most visible in B, where Sana herself recognises the gap as a personal experience over two years." } },
+  { qNum: 28, text: 'argues that what one wears is interpreted as a kind of claim?', correct: 'D',
+    solution: { evidence: "Extract D: 'what we wear is taken to be a kind of statement we are making about ourselves: about where we have come from, where we believe ourselves to be going, what we expect to be respected for.' Clothes are interpreted as claims about identity.",
+      whyNot: "<strong>C</strong> discusses clothing's hidden costs but offers no claim about identity-statements. The stem 'interpreted as a kind of claim' anchors uniquely in D's social-statement argument." } },
+  { qNum: 29, text: "implies that an inherited object can hold a piece of someone's earlier self?", correct: 'A',
+    solution: { evidence: "Extract A synthesises across four locations: (i) the yellow dress was the mother's at twenty-four; (ii) the photograph captures her singing on stage; (iii) the silk scarf wrapped around an old envelope; (iv) all three items now belong to the daughter. Each carries a piece of the mother as she was before her children existed.",
+      whyNot: "<strong>D</strong> discusses what clothes communicate to others, but D is general theory; A is the specific personal case where inherited objects hold the mother's earlier self for the daughter who now has them. The stem 'inherited object holds a piece of someone's earlier self' anchors in A." } },
+  { qNum: 30, text: 'argues that what reads as good taste cannot be separated from background?', correct: 'D',
+    solution: { evidence: "Extract D: 'Bourdieu's deeper finding... was that what reads as personal style is largely the visible expression of social class... taste, in this sense, is not free. It is the inheritance of where one started.' What appears as good taste cannot be separated from social origin.",
+      whyNot: "<strong>C</strong> discusses cost subsidies but offers no claim about taste and class. The stem 'good taste... background' anchors uniquely in D's Bourdieu argument about taste as class made visible." } }
+];
+
+const STATE = {
+  screen: 'name',
+  studentName: '',
+  startedAt: null,
+  finishedAt: null,
+  timerSeconds: TEST_META.durationSeconds,
+  timerHidden: false,
+  activeExtractIndex: 0,
+  // answers[qNum] = letter (A/B/C/D)
+  answers: {},
+  showSolution: {},
+  uploadStatus: 'pending'
+};
+
+let timerInterval = null;
+const root = document.getElementById('app');
+
+function render() {
+  switch (STATE.screen) {
+    case 'name': renderNameEntry(); break;
+    case 'confirm': renderConfirm(); break;
+    case 'test': renderTest(); break;
+    case 'submitConfirm': renderTest(); renderSubmitModal(); break;
+    case 'timeUp': renderTest(); renderTimeUpModal(); break;
+    case 'submitted': renderResults(); break;
+    case 'review': renderReview(); break;
+  }
+}
+
+function jkLogo() {
+  return `<div class="jk-logo">
+    <div class="mark">JK</div>
+    <div class="text">
+      <span class="l1">JK COACHING</span>
+      <span class="l2">COLLEGE</span>
+    </div>
+  </div>`;
+}
+
+function topBar() {
+  let timerCls = '';
+  if (STATE.timerSeconds <= 60) timerCls = 'danger';
+  else if (STATE.timerSeconds <= 180) timerCls = 'warning';
+  return `<div class="top-bar">
+    <div class="left-cluster">
+      <button class="zoom-btn" onclick="zoomToggle()">+</button>
+      <div class="timer-block ${timerCls}">
+        <div class="timer-digits" style="${STATE.timerHidden ? 'visibility:hidden' : ''}">${formatTimer()}</div>
+        ${STATE.timerHidden ? '' : `<div class="timer-labels"><span>Hours</span><span>Mins</span><span>Secs</span></div>`}
+      </div>
+      <button class="hide-time-btn" onclick="toggleHideTime()">${STATE.timerHidden ? 'Show time' : 'Hide time'}</button>
+    </div>
+    <div class="center-cluster"><span class="q-title">${TEST_META.title} · Q21–30</span></div>
+    <div class="right-cluster">${jkLogo()}</div>
+  </div>`;
+}
+
+function topBarSimple(text) {
+  return `<div class="top-bar">
+    <div class="left-cluster"><button class="zoom-btn">+</button></div>
+    <div class="center-cluster"><span class="q-title">${text}</span></div>
+    <div class="right-cluster">${jkLogo()}</div>
+  </div>`;
+}
+
+function renderNameEntry() {
+  root.innerHTML = `
+    ${topBarSimple(TEST_META.title + ' · Theme: ' + TEST_META.topic)}
+    <div class="cover-screen">
+      <div class="cover-card">
+        <div class="brand-mark">JK</div>
+        <h1>JK Coaching College</h1>
+        <div class="subtitle">${TEST_META.title} — Theme: ${TEST_META.topic}</div>
+        <div class="question">Please enter your name to begin</div>
+        <div class="sub">
+          You will have <strong>13 minutes</strong> to read four short extracts on the theme of fashion
+          and answer 10 questions (Q21–30). For each question, choose the option (A, B, C or D)
+          which you think best answers the question. Extracts may be used more than once.
+        </div>
+        <input type="text" class="name-input" id="nameInput" placeholder="e.g. Sarah Kim"
+               value="${escapeHtml(STATE.studentName)}"
+               oninput="STATE.studentName = this.value; document.getElementById('startBtn').disabled = !this.value.trim();"
+               onkeypress="if(event.key === 'Enter' && this.value.trim()) goConfirm()">
+        <div class="name-hint">${TEST_META.totalQuestions} questions · 13 minutes</div>
+        <div class="cover-actions">
+          <button id="startBtn" ${STATE.studentName.trim() ? '' : 'disabled'} onclick="goConfirm()">Continue</button>
+        </div>
+        <a href="../" class="back-link">← Back to home</a>
+      </div>
+    </div>
+  `;
+  setTimeout(() => document.getElementById('nameInput')?.focus(), 50);
+}
+
+function renderConfirm() {
+  root.innerHTML = `
+    ${topBarSimple('')}
+    <div class="cover-screen">
+      <div class="cover-card">
+        <div class="brand-mark">JK</div>
+        <h1>${escapeHtml(STATE.studentName)}</h1>
+        <div class="subtitle">${TEST_META.title} — Theme: ${TEST_META.topic}</div>
+        <div class="question">Ready to begin?</div>
+        <div class="sub">The timer (13 minutes) will start when you click Yes.<br>When time runs out the test is submitted automatically.</div>
+        <div class="cover-actions">
+          <button class="secondary" onclick="STATE.screen='name'; render();">No, go back</button>
+          <button onclick="startTest()">Yes, start</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTest() {
+  const extracts = PASSAGE.extracts;
+  const activeIdx = Math.min(STATE.activeExtractIndex, extracts.length - 1);
+  const activeExtract = extracts[activeIdx];
+
+  const tabsHtml = `<div class="extract-tabs">
+    ${extracts.map((ex, i) => `
+      <button class="extract-tab ${activeIdx === i ? 'active' : ''}" onclick="setExtract(${i})">${ex.label}</button>
+    `).join('')}
+  </div>`;
+
+  const stmtsHtml = STATEMENTS.map(st => {
+    const sel = STATE.answers[st.qNum] || '';
+    return `<div class="em-statement-row">
+      <div class="em-statement-num">${st.qNum}.</div>
+      <div class="em-statement-text">${st.text}</div>
+      <div class="em-select">
+        <select onchange="setAnswer(${st.qNum}, this.value)">
+          <option value="" ${!sel ? 'selected' : ''}>—</option>
+          <option value="A" ${sel === 'A' ? 'selected' : ''}>A</option>
+          <option value="B" ${sel === 'B' ? 'selected' : ''}>B</option>
+          <option value="C" ${sel === 'C' ? 'selected' : ''}>C</option>
+          <option value="D" ${sel === 'D' ? 'selected' : ''}>D</option>
+        </select>
+      </div>
+    </div>`;
+  }).join('');
+
+  root.innerHTML = `
+    ${topBar()}
+    <div class="content">
+      <div class="pane-left">
+        ${tabsHtml}
+        <div class="extract-instruction">Read the four extracts below on the theme of <strong>fashion</strong>.</div>
+        <div class="extract-content">${activeExtract.html}</div>
+      </div>
+      <div class="pane-right">
+        <div class="em-instruction">For questions 21–30, choose the option (A, B, C or D) which you think best answers the question. An extract may be used more than once.</div>
+        <div class="em-instruction bold">Which writer…</div>
+        <div class="em-statements">${stmtsHtml}</div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <button class="btn btn-back" onclick="goHome()">← Home</button>
+      <button class="btn btn-submit" onclick="goSubmit()">Submit ▸</button>
+    </div>
+  `;
+}
+
+function renderSubmitModal() {
+  const unanswered = STATEMENTS.filter(s => !STATE.answers[s.qNum]).length;
+  const modal = document.createElement('div');
+  modal.className = 'modal-bg';
+  modal.id = 'submitModal';
+  modal.innerHTML = `
+    <div class="modal-card">
+      <h2>Submit your test?</h2>
+      <p>${unanswered > 0 ? `You have <strong>${unanswered}</strong> unanswered question${unanswered > 1 ? 's' : ''}.` : 'You have answered all questions.'}<br>
+      Once submitted, you cannot change your answers.</p>
+      <div class="modal-actions">
+        <button class="secondary" onclick="cancelSubmit()">Cancel</button>
+        <button onclick="finalizeSubmit()">Submit</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function renderTimeUpModal() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-bg';
+  modal.id = 'timeUpModal';
+  modal.innerHTML = `
+    <div class="modal-card warning">
+      <h2>⏰ Time's up!</h2>
+      <p>The 13 minutes are over. Your test will be submitted automatically.</p>
+      <div class="modal-actions">
+        <button onclick="finalizeSubmit()">View Results</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function renderResults() {
+  const score = computeScore();
+  const elapsed = Math.floor((STATE.finishedAt - STATE.startedAt) / 1000);
+  const min = Math.floor(elapsed / 60);
+  const sec = elapsed % 60;
+  const pct = Math.round((score.correct / score.total) * 100);
+
+  let uploadHtml = '';
+  if (STATE.uploadStatus === 'pending') uploadHtml = `<div class="upload-status">Saving results to teacher dashboard…</div>`;
+  else if (STATE.uploadStatus === 'success') uploadHtml = `<div class="upload-status success">✓ Results saved to teacher dashboard</div>`;
+  else if (STATE.uploadStatus === 'error') uploadHtml = `<div class="upload-status error">Could not save automatically. Please notify your teacher of your score.</div>`;
+
+  root.innerHTML = `
+    ${topBarSimple('Test Complete')}
+    <div class="results-screen">
+      <div class="results-card">
+        <h1>Well Done!</h1>
+        <div class="student-line"><strong>${escapeHtml(STATE.studentName)}</strong> · ${TEST_META.title} · ${TEST_META.topic}</div>
+        <div class="score-display">
+          <span class="score">${score.correct}</span>
+          <span class="total">/ ${score.total}</span>
+        </div>
+        <div class="score-pct">${pct}%</div>
+        <div class="score-time">Time taken: ${min}m ${sec}s</div>
+        <div class="results-actions">
+          <button onclick="goReview()">Review Answers</button>
+          <button class="secondary" onclick="restartTest()">Restart</button>
+          <button class="secondary" onclick="goHome()">Home</button>
+        </div>
+        ${uploadHtml}
+      </div>
+    </div>
+  `;
+}
+
+function renderReview() {
+  const extracts = PASSAGE.extracts;
+  const activeIdx = Math.min(STATE.activeExtractIndex, extracts.length - 1);
+  const activeExtract = extracts[activeIdx];
+
+  const tabsHtml = `<div class="extract-tabs">
+    ${extracts.map((ex, i) => `
+      <button class="extract-tab ${activeIdx === i ? 'active' : ''}" onclick="setExtract(${i})">${ex.label}</button>
+    `).join('')}
+  </div>`;
+
+  const stmtsHtml = STATEMENTS.map(st => {
+    const userAns = STATE.answers[st.qNum];
+    const correctAns = st.correct;
+    const isCorrect = userAns === correctAns;
+
+    let rowCls, statusBadge;
+    if (!userAns) {
+      rowCls = 'review-unanswered';
+      statusBadge = `<span class="review-status-badge unanswered">—</span>`;
+    } else if (isCorrect) {
+      rowCls = 'review-correct';
+      statusBadge = `<span class="review-status-badge correct">✓ ${userAns}</span>`;
+    } else {
+      rowCls = 'review-wrong';
+      statusBadge = `<span class="review-status-badge wrong">✕ ${userAns}</span>`;
+    }
+
+    const isOpen = STATE.showSolution[st.qNum];
+    const correctDisplay = !isCorrect
+      ? `<div class="em-correct-display"><span class="label-arrow">→ Correct: </span>${correctAns}</div>`
+      : '';
+
+    return `<div class="em-statement-row ${rowCls}">
+      <div class="em-statement-num">${st.qNum}.</div>
+      <div class="em-statement-text">
+        ${st.text}
+        ${statusBadge}
+        ${correctDisplay}
+        <button class="solution-toggle-btn" onclick="toggleSolution(${st.qNum})">
+          ${isOpen ? '▲ Hide' : '💡 Solution'}
+        </button>
+      </div>
+      <div></div>
+      ${isOpen ? `<div class="solution-panel">
+        <h4>Why ${correctAns} is correct</h4>
+        <div>${st.solution.evidence}</div>
+        ${st.solution.whyNot ? `<h4 style="margin-top:8px;">Why not the others</h4><div class="why-not">${st.solution.whyNot}</div>` : ''}
+      </div>` : ''}
+    </div>`;
+  }).join('');
+
+  const score = computeScore();
+
+  root.innerHTML = `
+    <div class="review-banner">
+      <div class="info">
+        <span>Reviewing</span>
+        <span class="badge">${score.correct} / ${score.total}</span>
+      </div>
+      <div><button onclick="exitReview()">← Back to Results</button></div>
+    </div>
+    <div class="content">
+      <div class="pane-left">
+        ${tabsHtml}
+        <div class="extract-instruction">Read the four extracts below on the theme of <strong>fashion</strong>.</div>
+        <div class="extract-content">${activeExtract.html}</div>
+      </div>
+      <div class="pane-right">
+        <div class="em-instruction bold">Review — Q21–Q30</div>
+        <div class="em-statements">${stmtsHtml}</div>
+      </div>
+    </div>
+  `;
+}
+
+/* HANDLERS */
+function setExtract(i) { STATE.activeExtractIndex = i; render(); }
+function setAnswer(qNum, value) {
+  if (!value) {
+    delete STATE.answers[qNum];
+  } else {
+    STATE.answers[qNum] = value;
+  }
+  // No re-render — preserve dropdown state. Just save.
+}
+
+function goConfirm() { if (!STATE.studentName.trim()) return; STATE.screen = 'confirm'; render(); }
+function startTest() {
+  STATE.screen = 'test';
+  STATE.startedAt = Date.now();
+  startTimer();
+  render();
+}
+function goSubmit() { STATE.screen = 'submitConfirm'; render(); }
+function cancelSubmit() {
+  STATE.screen = 'test';
+  document.getElementById('submitModal')?.remove();
+}
+function finalizeSubmit() {
+  stopTimer();
+  STATE.finishedAt = Date.now();
+  STATE.screen = 'submitted';
+  document.getElementById('submitModal')?.remove();
+  document.getElementById('timeUpModal')?.remove();
+  uploadResults();
+  render();
+}
+function goReview() { STATE.screen = 'review'; render(); }
+function exitReview() { STATE.screen = 'submitted'; render(); }
+function toggleSolution(qNum) {
+  STATE.showSolution[qNum] = !STATE.showSolution[qNum];
+  render();
+}
+function restartTest() {
+  if (!confirm('Restart the test? All answers will be cleared.')) return;
+  STATE.screen = 'name';
+  STATE.studentName = '';
+  STATE.timerSeconds = TEST_META.durationSeconds;
+  STATE.timerHidden = false;
+  STATE.activeExtractIndex = 0;
+  STATE.answers = {};
+  STATE.showSolution = {};
+  STATE.uploadStatus = 'pending';
+  STATE.startedAt = null;
+  STATE.finishedAt = null;
+  stopTimer();
+  render();
+}
+function goHome() {
+  if (STATE.screen === 'test' && Object.keys(STATE.answers).length > 0) {
+    if (!confirm('Leave the test? Your progress will be lost.')) return;
+  }
+  window.location.href = '../';
+}
+
+function startTimer() {
+  stopTimer();
+  timerInterval = setInterval(() => {
+    STATE.timerSeconds--;
+    if (STATE.timerSeconds <= 0) {
+      stopTimer();
+      STATE.timerSeconds = 0;
+      STATE.screen = 'timeUp';
+      render();
+      return;
+    }
+    updateTimerDisplay();
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+function updateTimerDisplay() {
+  const el = document.querySelector('.timer-digits');
+  if (el) el.innerHTML = formatTimer();
+  const block = document.querySelector('.timer-block');
+  if (block) {
+    block.classList.remove('warning', 'danger');
+    if (STATE.timerSeconds <= 60) block.classList.add('danger');
+    else if (STATE.timerSeconds <= 180) block.classList.add('warning');
+  }
+}
+function formatTimer() {
+  const h = Math.floor(STATE.timerSeconds / 3600);
+  const m = Math.floor((STATE.timerSeconds % 3600) / 60);
+  const s = STATE.timerSeconds % 60;
+  const pad = n => String(n).padStart(2, '0');
+  return `<span class="num">${pad(h)}</span><span class="colon">:</span><span class="num">${pad(m)}</span><span class="colon">:</span><span class="num">${pad(s)}</span>`;
+}
+function toggleHideTime() { STATE.timerHidden = !STATE.timerHidden; render(); }
+function zoomToggle() {
+  const cur = parseFloat(document.body.style.zoom || '1');
+  document.body.style.zoom = cur >= 1.2 ? '1' : (cur + 0.1).toFixed(1);
+}
+
+function computeScore() {
+  let correct = 0;
+  STATEMENTS.forEach(s => { if (STATE.answers[s.qNum] === s.correct) correct++; });
+  return { correct, total: STATEMENTS.length };
+}
+
+function uploadResults() {
+  if (!GOOGLE_SHEETS_URL) {
+    STATE.uploadStatus = 'disabled';
+    return;
+  }
+  const score = computeScore();
+  const elapsed = Math.floor((STATE.finishedAt - STATE.startedAt) / 1000);
+  const answersStr = STATEMENTS.map(s => {
+    const u = STATE.answers[s.qNum] || '-';
+    return `Q${s.qNum}:${u}(${s.correct})`;
+  }).join(' | ');
+
+  const payload = {
+    studentName: STATE.studentName,
+    setName: TEST_META.testId,
+    timestamp: new Date().toISOString(),
+    timestampLocal: new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' }),
+    totalScore: score.correct,
+    totalPossible: score.total,
+    percentage: Math.round((score.correct / score.total) * 100),
+    timeTakenSeconds: elapsed,
+    timeTakenFormatted: `${Math.floor(elapsed/60)}m ${elapsed%60}s`,
+    sectionA: '-', sectionB: '-', sectionC: '-', sectionD: '-', sectionE: '-',
+    answers: answersStr
+  };
+
+  STATE.uploadStatus = 'pending';
+  render();
+
+  fetch(GOOGLE_SHEETS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    STATE.uploadStatus = 'success';
+    if (STATE.screen === 'submitted') render();
+  }).catch(() => {
+    STATE.uploadStatus = 'error';
+    if (STATE.screen === 'submitted') render();
+  });
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"
+  }[c]));
+}
+
+render();
+</script>
+</body>
+</html>
