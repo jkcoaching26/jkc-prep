@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Sentence Insertion — The Power of Reading Aloud</title>
+<title>Gap Text — The Quiet Empire of the Bunyip Trick</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -477,57 +477,56 @@ input { font-family: inherit; }
 const GOOGLE_SHEETS_URL = '';
 
 const TEST_META = {
-  testId: 'TestDay-Cloze-ReadingAloud',
-  title: 'Sentence Insertion',
-  topic: 'The Power of Reading Aloud',
+  testId: 'TestDay-GapText-Bunyip',
+  title: 'Gap Text',
+  topic: 'The Quiet Empire of the Bunyip Trick',
   durationSeconds: 540,  // 9 minutes
   totalQuestions: 6
 };
 
 const PASSAGE = {
-  title: 'The Power of Reading Aloud',
-  subtitle: 'Test-day morning paper — real-test calibration',
-  // Use {{N}} for gap markers
-  bodyHtml: `<p>For most of the past century, reading aloud was treated as a children's activity. Once a student could read silently, schools assumed the noisy stage was over. Researchers have arrived at a different account of what reading aloud does to the older brain.</p>
-<p>Reading aloud is not simply reading with the volume turned up. It forces the reader to slow down and notice patterns the eye can skim. {{15}} These quiet learning effects, produced by the steady use of the voice, deliver several gains schools spend money trying to engineer through software.</p>
-<p>Education researchers asking whether reading aloud produced effects on older students have produced surprising findings. Studies tracking thousands of students from Year 4 to Year 8 have produced consistent results, even after adjusting for income and prior achievement. {{16}} Such effects have moved reading aloud into the centre of literacy planning.</p>
-<p>{{17}} This paradox — a practice long dismissed as childish turning out to be essential to advanced reading — forced a reconsideration of how literacy had been taught. The same teachers who had treated silent reading as the marker of maturity were now reconsidering what had been lost.</p>
-<p>Bringing reading aloud back is not simple. Timetables have been built around silent reading for decades, and adolescent students feel embarrassed reading aloud in front of peers. The disagreement is sharpest in the upper-primary and early-secondary years. {{18}} These tensions mean the practice most needed is also the hardest to introduce.</p>
-<p>Where reform has succeeded, the success has depended on agreements between teachers, parents and students. The programs that have emerged share a common feature — they begin with small voluntary groups of older students before being extended to whole classes. {{19}} These programs have produced documented improvements that silent reading alone could not deliver.</p>
-<p>The most consequential change is institutional. The categories under which schools plan reading were built around the assumption that reading aloud was a stage that ended early. That assumption is now being formally revised. {{20}} This shift in classification moves reading aloud into the core literacy categories of every year level.</p>`,
+  title: 'The Quiet Empire of the Bunyip Trick',
+  subtitle: 'Test-day morning paper — Gap Text · 9 minutes',
+  bodyHtml: `<p>For most of a hundred years, the bunyip — the shy, water-dwelling creature of older Australian stories — has appeared in almost every children's picture book published in this country. The story of how the bunyip came to occupy that place, and of the three illustrators across a century who shaped what it became, turns out to be a story of small printing rooms, pushy teachers, school libraries that ran out of shelf space, and a slow argument about what an Australian children's book is actually for.</p>
+<p>May Whitlock, a Sydney kindergarten teacher, had found herself increasingly impatient with the storybooks her pupils were given. The shelves of the local library carried English fairies and German goblins but nothing recognisably from the country outside the window. Whitlock spent the long summer of 1922 painting watercolour sketches at her sister's farm near Bowral, drawing the bunyip the way her grandmother had described it — small, mossy, and given to vanishing into bottles. {{15}} Within six months Whitlock had sold every copy, mostly to other kindergarten teachers and the parents of her pupils, and a second printing of two thousand copies followed in early 1924.</p>
+<p>The book caught the attention of two Sydney newspapers and was the subject of a feature in the Women's Weekly the following year. Whitlock continued painting bunyip stories for the next twelve years, producing six more books, each printed from the same small press in Glebe. She never set up a formal publishing company and never accepted offers from larger firms, preferring to control the appearance of every page herself. When she retired from teaching in 1935, the small press kept printing her books from her original plates until the building was lost. {{16}}</p>
+<p>By the 1970s, Australian children's publishing had multiplied. But the new books on most school library shelves were largely American and British imports, and Margaret Park, a Sydney primary school librarian who had grown up reading Whitlock's bunyip stories, opposed this trend from the start. {{17}} Park had spent her childhood believing that bunyips lived in the Wollondilly River near her grandparents' farm, and she could not see why a Sydney child in 1972 should not have the same experience with the books on her library shelf.</p>
+<p>In 1973, Park began commissioning short bunyip picture books from young illustrators, printing them on a small printing press she had bought second-hand from a school in Marrickville. Bunyip Books, the imprint she founded under her own kitchen table, distributed its first titles to her own school's library and then, gradually, to the libraries of other primary schools in the district. The first hundred orders came from teachers willing to risk a small unfamiliar imprint. {{18}} Within five years Park had moved Bunyip Books to a larger warehouse in Marrickville, hired three full-time illustrators, and had begun supplying the libraries of every state primary school in New South Wales.</p>
+<p>By 1985, Bunyip Books had published more than forty titles, and the imprint's stories were being supplied to school libraries in every Australian state. In that decade Park signed an agreement with the New South Wales Department of Education, donating the printing rights of the imprint's twenty most popular books in exchange for royalties paid to the families of the original illustrators. The agreement was honoured for the next thirty years, until physical school-library budgets contracted in the late 2010s. {{19}} By the early 2020s, Bunyip Books survived only as scanned PDFs on a Department of Education portal, and a Sydney that had once been the capital of Australian children's publishing was no longer the centre of how Australian children read.</p>
+<p>The Australian children's picture book faced an unfamiliar problem in the new century. Children no longer turned the pages of cardboard books; they scrolled through stories on tablets, often before bed. Eliza Tran, a Melbourne-born illustrator who launched the Long Story Short platform in 2021, began experimenting with animated picture-book formats for the digital reader. "I grew up with my grandmother telling me bunyip stories in Vietnamese," Tan told an interviewer. "She always said, 'A bunyip never stops moving.' My picture books have to move too — that's the only way the bunyip survives the screen." {{20}} Tan calls Long Story Short an "animated picture platform" rather than a publishing house, a name she hopes will outlast its slightly awkward sound.</p>`,
   gaps: [
-    { qNum: 15, correctLetter: 'C',
-      solution: { evidence: "After the gap: 'these quiet learning effects'. The gap needs the EFFECTS named first. C names three: vocabulary, comprehension, hearing how language sounds. 'It' anchors back to reading aloud.",
-        whyNot: "<strong>F</strong> describes a measured outcome (twelve percent score rise) — also tempting because it's about reading aloud. But 'these quiet learning effects' needs effects, not a measurement. F belongs at Gap 16, where 'such effects' needs the measured number." } },
-    { qNum: 16, correctLetter: 'F',
-      solution: { evidence: "After the gap: 'such effects' — needs a measured outcome. F gives the number (twelve percent rise in vocabulary scores).",
-        whyNot: "<strong>C</strong> also describes positive outcomes of reading aloud, which can tempt at Gap 16. But 'such effects' specifically needs a quantified study finding, not a list of mechanisms. C's effects are processes; F's effect is a measurement." } },
+    { qNum: 15, correctLetter: 'E',
+      solution: { evidence: "The sentence before describes Whitlock 'painting watercolour sketches', and the sentence after says 'Within six months Whitlock had sold every copy.' The gap requires a PUBLICATION moment. E supplies it: 'Thus Bunyip in the Bottle was published in Sydney in 1923, with a small print run.' The connective 'Thus' echoes the cause-and-effect, and the title 'Bunyip in the Bottle' picks up the previous sentence's 'vanishing into bottles'.",
+        whyNot: "<strong>G</strong> ('The original Whitlock printing in Glebe was destroyed by flood in 1947') is also about Whitlock's printing, but G describes the modern fate of the press — destroyed and at auctions — which contradicts the next sentence ('Within six months Whitlock had sold every copy') which requires the press operating, not destroyed. G is a closing comment, not a founding event. G belongs at Gap 16." } },
+    { qNum: 16, correctLetter: 'G',
+      solution: { evidence: "Gap 16 sits at the end of paragraph 3, with the next paragraph beginning with a new pioneer (Park). The gap requires a CLOSING COMMENT on Whitlock's era. G provides exactly that: 'The original Whitlock printing in Glebe was destroyed by flood in 1947, but signed copies still appear at auctions.' 'The original Whitlock printing in Glebe' refers anaphorically to the Glebe press described in the paragraph.",
+        whyNot: "<strong>D</strong> ('The Marrickville warehouse closed for good by the time the digital editions launched') is also a closing statement about a Sydney site. But D specifies MARRICKVILLE and DIGITAL EDITIONS — neither has been mentioned at this point. Park's Marrickville and Tan's digital editions appear later. D is anachronistic at Gap 16. D belongs at Gap 19." } },
     { qNum: 17, correctLetter: 'A',
-      solution: { evidence: "Gap 17 starts P4. After: 'this paradox' — needs a paradox. A IS a paradox: classrooms without reading aloud became MORE screen-dependent, not better readers. 'X but not Y' structure = paradox.",
-        whyNot: "<strong>E</strong> is also a researcher-realisation-style sentence and could feel like the start of P4. But E states a NEW CATEGORY, not a paradox. 'This paradox' needs a reversal of expectation. E belongs at Gap 20, where 'this shift in classification' needs a category statement." } },
-    { qNum: 18, correctLetter: 'G',
-      solution: { evidence: "P5 sets up the conflict ('older students feel embarrassed', 'upper-primary and early-secondary years'). The gap closes the paragraph before 'these tensions'. G names the specific outcome: proposals defeated where 'older students set the tone'. 'Older students' anchors back to the embarrassed adolescents.",
-        whyNot: "<strong>D</strong> ('Teachers run weekly reading sessions… students choose the books') is tempting because it mentions reading-aloud activity. But D describes a SUCCESS pattern. At Gap 18 the surrounding paragraph is about RESISTANCE, and the next sentence calls it 'these tensions'. Tensions need a defeat or a refusal, not a working program." } },
+      solution: { evidence: "The sentence before says Park 'opposed this trend from the start.' The sentence after begins 'Park had spent her childhood believing that bunyips lived in the Wollondilly River.' The gap requires a specific complaint that gives Park concrete grounds for opposition. A does this: 'She told a fellow teacher that the imported books showed English meadows to children in Sydney suburbs.' The English-meadows-vs-Sydney-suburbs mismatch contrasts with the Wollondilly-River-as-real-bunyip-territory.",
+        whyNot: "<strong>F</strong> ('The new edition included two-colour printing and sold sixty thousand copies in three years') is also about a Park book. But F describes her later success, not her earlier grievance. The next sentence requires a reason for her opposition — the English-meadows complaint, not later success. F belongs at Gap 18." } },
+    { qNum: 18, correctLetter: 'F',
+      solution: { evidence: "The sentence before says 'The first hundred orders came from teachers willing to risk a small unfamiliar imprint.' The sentence after describes the move to a larger Marrickville warehouse. The gap requires a description of the book/edition that explains how Bunyip Books went from a hundred orders to state-wide supplier. F does this: 'The new edition included two-colour printing and sold sixty thousand copies in three years' — explaining the scale that made the warehouse expansion necessary.",
+        whyNot: "<strong>D</strong> ('The Marrickville warehouse closed for good by the time the digital editions launched') is about the CLOSURE of the warehouse, dated long after the project succeeded. At Gap 18, Park's expansion is just beginning; the next sentence describes her MOVING INTO the warehouse, not its eventual closure. D belongs at Gap 19." } },
     { qNum: 19, correctLetter: 'D',
-      solution: { evidence: "After the gap: 'these programs'. The gap needs the program activities named first. D names three: teacher reading sessions, parent volunteers, student book choice.",
-        whyNot: "<strong>G</strong> is about reading-aloud proposals at the school level too. But G describes proposals being DEFEATED — the wrong direction for P6, which is the success paragraph. The paragraph before the gap describes programs being EXTENDED to whole classes; G's defeated proposals contradict this." } },
-    { qNum: 20, correctLetter: 'E',
-      solution: { evidence: "After the gap: 'this shift in classification' — needs a stated reclassification. E is the reclassification: reading aloud as core literacy skill, not early-childhood stage. 'X rather than Y' structure = classification shift.",
-        whyNot: "<strong>A</strong> is also a researcher-realisation sentence. But A names a research finding (about screen-dependence), not a category change. 'This shift in classification' needs a category statement. E gives the new category; A gives a research result. A belongs at Gap 17 (the paradox)." } }
+      solution: { evidence: "The sentence before says the agreement 'was honoured for the next thirty years, until physical school-library budgets contracted in the late 2010s.' The sentence after begins 'By the early 2020s, Bunyip Books survived only as scanned PDFs.' The gap requires a TIMING/MEDIUM PUNCHLINE that bridges late-2010s budget contraction and early-2020s digital-only survival. D supplies it: 'The Marrickville warehouse closed for good by the time the digital editions launched.'",
+        whyNot: "<strong>G</strong> ('The original Whitlock printing in Glebe was destroyed by flood in 1947') is also a closing statement about a Sydney printing site. But G is about WHITLOCK'S Glebe press (1920s-1947); D is about the MARRICKVILLE warehouse that housed Bunyip Books (1970s-2010s). The next sentence requires a Park-era closure that bridges to digital, not a Whitlock-era flood commemoration. G belongs at Gap 16." } },
+    { qNum: 20, correctLetter: 'C',
+      solution: { evidence: "The sentence before ends with Tan's quoted words containing an EMBEDDED QUOTE from her grandmother: 'A bunyip never stops moving.' The gap requires a sentence that addresses what Tan's team does with that phrase. C does this: 'The very phrase has become a kind of motto for Tan and her illustrators.' 'The very phrase' anaphorically refers to the grandmother's quoted words.",
+        whyNot: "<strong>A</strong> ('She told a fellow teacher that the imported books showed English meadows to children in Sydney suburbs') describes a complaint about meadow imagery, but does NOT quote anyone. 'The very phrase' specifically requires a prior described phrase — quoted words. The grandmother's 'A bunyip never stops moving' IS the phrase that 'the very phrase' references. A belongs at Gap 17 (Park's complaint)." } }
   ]
 };
 
 const SENTENCES = [
-  { letter: 'A', text: 'Researchers gradually realised that classrooms without reading aloud had become more screen-dependent, not better readers.' },
-  { letter: 'B', text: "Schools now teach more than half of the world's children and continue to expand rapidly." },
-  { letter: 'C', text: 'It strengthens vocabulary, sharpens comprehension, and lets the reader hear how written language is meant to sound.' },
-  { letter: 'D', text: 'Teachers run weekly reading sessions, parents volunteer to listen, and students choose the books they read.' },
-  { letter: 'E', text: 'Reading aloud is increasingly classified as a core literacy skill rather than an early-childhood stage.' },
-  { letter: 'F', text: 'Vocabulary scores rose by roughly twelve percent in classrooms where students read aloud daily.' },
-  { letter: 'G', text: 'Proposals to introduce daily reading aloud are most often defeated in schools where older students set the tone.' }
+  { letter: 'A', text: 'She told a fellow teacher that the imported books showed English meadows to children in Sydney suburbs.' },
+  { letter: 'B', text: 'These habits have endured because Australian children read what their teachers and parents read first.' },
+  { letter: 'C', text: 'The very phrase has become a kind of motto for Tan and her illustrators.' },
+  { letter: 'D', text: 'The Marrickville warehouse closed for good by the time the digital editions launched.' },
+  { letter: 'E', text: 'Thus Bunyip in the Bottle was published in Sydney in 1923, with a small print run.' },
+  { letter: 'F', text: 'The new edition included two-colour printing and sold sixty thousand copies in three years.' },
+  { letter: 'G', text: 'The original Whitlock printing in Glebe was destroyed by flood in 1947, but signed copies still appear at auctions.' }
 ];
 const EXTRA_LETTER = 'B';
-const EXTRA_NOTE = "Sentence B (\"Schools now teach more than half of the world's children and continue to expand rapidly.\") is the unused option. It is a generic fact about world school populations — thematically about education, but a population statistic, not a feature of reading aloud. Every gap calls for a specific structural element (effects, measurement, paradox, defeat, programs, classification). B supplies none of these.";
+const EXTRA_NOTE = "Sentence B (\"These habits have endured because Australian children read what their teachers and parents read first.\") is the unused option. It is thematically connected — the text is about Australian children's reading culture across generations — but the connective 'These habits' demands a prior described tradition of multi-generational reading inheritance, which no gap requires. B is most tempting at Gap 20, where Tan's grandmother represents an inherited reading tradition; but the previous sentence ends with the grandmother's quoted phrase 'A bunyip never stops moving', which B does not address. B is a recognisable kind of extra: thematically right, structurally inert.";
 
 const STATE = {
   screen: 'name',

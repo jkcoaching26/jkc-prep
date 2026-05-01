@@ -124,6 +124,8 @@ html, body {
 }
 .card.gold::before { background: var(--jk-gold); }
 .card.purple::before { background: #6b4c9a; }
+.card.teal::before { background: #0d7c8e; }
+.card.orange::before { background: #c0532e; }
 
 .card:hover {
   transform: translateY(-4px);
@@ -132,6 +134,8 @@ html, body {
 }
 .card.gold:hover { border-color: var(--jk-gold); }
 .card.purple:hover { border-color: #6b4c9a; }
+.card.teal:hover { border-color: #0d7c8e; }
+.card.orange:hover { border-color: #c0532e; }
 
 .card .num {
   width: 50px; height: 50px;
@@ -148,6 +152,8 @@ html, body {
 }
 .card.gold .num { background: var(--jk-gold); }
 .card.purple .num { background: #6b4c9a; }
+.card.teal .num { background: #0d7c8e; }
+.card.orange .num { background: #c0532e; }
 
 .card h2 {
   font-family: 'Lora', Georgia, serif;
@@ -178,6 +184,8 @@ html, body {
 }
 .card.gold .tag { background: #fdf6e7; color: #8a6a1a; }
 .card.purple .tag { background: #f0e8f7; color: #4a3070; }
+.card.teal .tag { background: #e0f2f4; color: #075863; }
+.card.orange .tag { background: #fbe9e1; color: #8c3a1f; }
 
 .card .arrow {
   margin-top: auto;
@@ -192,9 +200,13 @@ html, body {
 }
 .card.gold .arrow { background: var(--jk-gold); color: #1a1a1a; }
 .card.purple .arrow { background: #6b4c9a; }
+.card.teal .arrow { background: #0d7c8e; }
+.card.orange .arrow { background: #c0532e; }
 .card:hover .arrow { background: var(--jk-navy-dark); }
 .card.gold:hover .arrow { background: #b89348; }
 .card.purple:hover .arrow { background: #4a3070; }
+.card.teal:hover .arrow { background: #075863; }
+.card.orange:hover .arrow { background: #8c3a1f; }
 
 .tip-strip {
   margin: 36px auto 0;
@@ -285,6 +297,36 @@ html, body {
         <div class="desc">
           Six paragraphs. Drag each summary option into the paragraph
           it best summarises.
+        </div>
+        <div class="meta">
+          <span class="tag">6 questions</span>
+          <span class="tag">9 minutes</span>
+        </div>
+        <div class="arrow">Start →</div>
+      </a>
+
+      <a href="extract-fashion/" class="card teal">
+        <div class="num">4</div>
+        <h2>Multiple Extracts</h2>
+        <div class="topic">Theme — Fashion</div>
+        <div class="desc">
+          Four short extracts. Match each statement to the writer who said it.
+          Q21–30 in real exam format.
+        </div>
+        <div class="meta">
+          <span class="tag">10 questions</span>
+          <span class="tag">13 minutes</span>
+        </div>
+        <div class="arrow">Start →</div>
+      </a>
+
+      <a href="cloze-bunyip/" class="card orange">
+        <div class="num">5</div>
+        <h2>Gap Text</h2>
+        <div class="topic">The Quiet Empire of the Bunyip Trick</div>
+        <div class="desc">
+          Six sentences have been removed from the text.
+          Drag each sentence into the matching gap.
         </div>
         <div class="meta">
           <span class="tag">6 questions</span>
