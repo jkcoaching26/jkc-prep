@@ -1,0 +1,2094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OC Reading Practice — JK Coaching College</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --jk-navy: #002664;
+  --jk-navy-dark: #001a47;
+  --jk-gold: #c9a55c;
+  --gap-blue: #4a6e9c;
+  --slot-bg: #4a6b9c;
+  --opt-border: #8aa1c4;
+  --opt-bg: #f5f7fa;
+  --bg-page: #d6d8db;
+  --header-bg: #e7ecf2;
+  --border: #c7c7c7;
+  --text: #1a1a1a;
+  --muted: #6b6b6b;
+  --correct-green: #15803d;
+  --wrong-red: #b91c1c;
+  --flag-orange: #d97706;
+}
+html, body {
+  height: 100%;
+  font-family: 'Public Sans', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  color: var(--text);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input { font-family: inherit; }
+
+#app { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+/* TOP BAR */
+.top-bar {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; background: #fff;
+  border-bottom: 1px solid var(--border);
+  height: 76px; padding: 0 14px; flex-shrink: 0; gap: 12px;
+}
+.left-cluster { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.zoom-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--jk-navy); color: #fff; font-size: 22px;
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.zoom-btn:hover { background: var(--jk-navy-dark); }
+.timer-block { display: flex; align-items: flex-start; gap: 8px; }
+.timer-digits { display: flex; align-items: baseline; font-weight: 700; font-variant-numeric: tabular-nums; }
+.timer-digits .num { font-size: 26px; line-height: 1; }
+.timer-digits .colon { font-size: 22px; line-height: 1; padding: 0 1px; }
+.timer-labels { display: flex; gap: 9px; margin-top: 4px; font-size: 11px; font-weight: 500; color: #444; }
+.timer-block.warning .timer-digits { color: var(--flag-orange); }
+.timer-block.danger .timer-digits { color: var(--wrong-red); animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.hide-time-btn {
+  background: var(--jk-navy); color: #fff;
+  font-size: 11px; font-weight: 600;
+  border-radius: 50%; width: 46px; height: 46px;
+  display: inline-flex; align-items: center; justify-content: center;
+  text-align: center; line-height: 1.05; padding: 4px;
+  user-select: none; flex-shrink: 0;
+}
+.hide-time-btn:hover { background: var(--jk-navy-dark); }
+.center-cluster {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--header-bg); padding: 12px 24px;
+  gap: 14px; min-width: 280px; height: 56px;
+}
+.center-cluster .q-title { font-size: 17px; font-weight: 600; color: #1a1a1a; }
+.right-cluster { display: flex; justify-content: flex-end; align-items: center; padding-right: 8px; }
+.jk-logo { display: inline-flex; align-items: center; gap: 10px; user-select: none; }
+.jk-logo .mark {
+  width: 46px; height: 46px;
+  background: var(--jk-navy); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Lora', Georgia, serif; font-weight: 700; font-size: 22px;
+  letter-spacing: -1px; border-radius: 4px; position: relative;
+}
+.jk-logo .mark::after {
+  content: ""; position: absolute; bottom: 4px; right: 4px;
+  width: 8px; height: 8px; background: var(--jk-gold); border-radius: 50%;
+}
+.jk-logo .text { display: flex; flex-direction: column; line-height: 1.05; }
+.jk-logo .l1 { font-weight: 700; font-size: 14px; color: var(--jk-navy); letter-spacing: 0.5px; }
+.jk-logo .l2 { font-weight: 600; font-size: 9px; color: var(--jk-navy); letter-spacing: 1.2px; margin-top: 3px; }
+
+/* SECTION NAV */
+.section-nav {
+  display: flex; align-items: center;
+  background: var(--jk-navy); color: #fff;
+  border-bottom: 1px solid var(--jk-navy-dark);
+  flex-shrink: 0; height: 44px;
+  padding: 0 14px; gap: 0;
+  overflow-x: auto;
+}
+.section-tab {
+  padding: 0 18px; height: 100%;
+  display: inline-flex; align-items: center;
+  font-size: 14px; font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.section-tab:hover { color: #fff; background: rgba(255,255,255,0.05); }
+.section-tab.active {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+  border-bottom-color: var(--jk-gold);
+}
+.section-tab .badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  margin-left: 8px;
+  min-width: 36px;
+  text-align: center;
+}
+.section-tab.active .badge {
+  background: var(--jk-gold);
+  color: var(--jk-navy);
+}
+
+/* CONTENT */
+.content {
+  flex: 1; display: flex;
+  background: #fff;
+  overflow: hidden; position: relative;
+  min-height: 0;
+}
+.pane-left, .pane-right {
+  flex: 1; overflow-y: auto;
+  padding: 22px 30px 36px;
+  position: relative; min-height: 0;
+}
+.pane-left { border-right: 1px solid var(--border); }
+
+/* Single-pane layout for sections that don't need a passage on the side */
+.content.single-pane .pane-left { border-right: none; }
+.content.single-pane .pane-right { display: none; }
+
+.section-header {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 22px; font-weight: 600;
+  color: var(--jk-navy);
+  margin-bottom: 4px;
+}
+.section-subhead {
+  font-size: 13px; color: var(--muted);
+  margin-bottom: 14px; font-style: italic;
+}
+.passage-title {
+  font-family: 'Lora', Georgia, serif;
+  text-align: center; font-weight: 600;
+  font-size: 22px; margin: 8px 0 16px;
+  color: var(--jk-navy);
+}
+.passage-subtitle {
+  text-align: center; font-style: italic;
+  color: #555; font-size: 13.5px;
+  margin-bottom: 22px;
+}
+.instruction {
+  font-weight: 700; margin-bottom: 14px;
+  font-size: 14.5px; line-height: 1.5;
+}
+.passage-body {
+  font-size: 16px; line-height: 1.75;
+}
+.passage-body p { margin-bottom: 14px; }
+.passage-body strong.bold-marker { font-weight: 700; }
+
+/* MCQ QUESTIONS (used in A and C) */
+.mcq-block {
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e8eaee;
+}
+.mcq-block:last-child { border-bottom: none; }
+.mcq-stem {
+  font-size: 15.5px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  line-height: 1.5;
+  display: flex;
+  gap: 8px;
+}
+.mcq-stem .q-num {
+  color: var(--jk-navy);
+  font-weight: 700;
+  flex-shrink: 0;
+  min-width: 32px;
+}
+.mcq-options { display: flex; flex-direction: column; gap: 6px; }
+.mcq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 14px;
+  border: 1.5px solid #c7c7c7;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.12s;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+.mcq-option:hover { background: #f0f5ff; border-color: var(--jk-navy); }
+.mcq-option.selected {
+  background: #e0ebff;
+  border-color: var(--jk-navy);
+  border-width: 2px;
+  padding: 8px 13px;
+}
+.mcq-option .opt-letter {
+  font-weight: 700;
+  color: var(--jk-navy);
+  background: #e7ecf2;
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-size: 13px;
+  min-width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.mcq-option.selected .opt-letter {
+  background: var(--jk-navy);
+  color: #fff;
+}
+
+/* CLOZE inline dropdown (Section B) */
+.cloze-paragraph {
+  font-size: 16px;
+  line-height: 2;
+  margin-bottom: 14px;
+}
+.cloze-gap {
+  display: inline-block;
+  margin: 0 3px;
+  vertical-align: baseline;
+  position: relative;
+}
+.cloze-gap-num {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--jk-navy);
+  background: rgba(0,38,100,0.08);
+  padding: 1px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.cloze-select {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 5px 26px 5px 10px;
+  border: 1.5px solid #5a5a5a;
+  border-radius: 3px;
+  background: #fff;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  min-width: 140px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><polygon points='0,0 10,0 5,6' fill='%23002664'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+.cloze-select:focus { outline: none; border-color: var(--jk-navy); border-width: 2px; padding: 4px 25px 4px 9px; }
+
+/* POETRY (Section C) */
+.poem-body {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 16.5px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin: 0 auto;
+  max-width: 480px;
+  padding: 6px 0;
+}
+.poem-body .stanza-break { display: block; height: 0.8em; }
+.poem-body em { font-style: italic; }
+.poem-body strong { font-weight: 700; }
+.poem-title {
+  font-family: 'Lora', Georgia, serif;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--jk-navy);
+  margin: 8px 0 6px;
+}
+.poem-subtitle {
+  text-align: center;
+  font-style: italic;
+  color: #555;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+/* GAP TEXT (Section D) */
+.gap-paragraph {
+  font-size: 15.5px;
+  line-height: 1.85;
+  margin-bottom: 18px;
+}
+.gap-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+  background: #fff;
+  border: 2px dashed var(--gap-blue);
+  border-radius: 3px;
+  padding: 5px 10px;
+  margin: 0 3px;
+  min-width: 240px;
+  min-height: 32px;
+  font-size: 14px;
+  color: #555;
+  font-style: italic;
+  transition: all 0.15s;
+}
+.gap-inline.drag-over {
+  background: #fef3c7;
+  border-color: var(--flag-orange);
+  border-style: solid;
+  transform: scale(1.02);
+}
+.gap-inline.filled {
+  background: #e0ebff;
+  border: 2px solid var(--jk-navy);
+  color: var(--jk-navy);
+  font-style: normal;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 240px;
+}
+.gap-inline .gap-label {
+  font-weight: 700;
+  color: var(--jk-navy);
+  background: rgba(0, 38, 100, 0.1);
+  padding: 2px 7px;
+  border-radius: 2px;
+  font-size: 13px;
+  font-style: normal;
+  flex-shrink: 0;
+}
+.gap-inline.filled .gap-label { background: rgba(255,255,255,0.6); }
+.gap-inline .gap-content {
+  flex: 1;
+  font-size: 14.5px;
+  line-height: 1.4;
+}
+.gap-inline .gap-clear {
+  background: rgba(255,255,255,0.7);
+  color: #555;
+  border-radius: 50%;
+  width: 18px; height: 18px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0;
+}
+.gap-inline .gap-clear:hover { background: var(--wrong-red); color: #fff; }
+
+.sentences-list { display: flex; flex-direction: column; gap: 10px; }
+.sentence-card {
+  border: 2px solid var(--gap-blue);
+  background: #fff;
+  border-radius: 4px;
+  padding: 12px 14px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: #1a1a1a;
+  cursor: grab;
+  transition: all 0.12s;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  user-select: none;
+}
+.sentence-card:hover {
+  background: #f0f5ff;
+  border-color: var(--jk-navy);
+  box-shadow: 0 2px 6px rgba(0,38,100,0.12);
+}
+.sentence-card:active { cursor: grabbing; }
+.sentence-card.dragging { opacity: 0.4; cursor: grabbing; transform: scale(0.97); }
+.sentence-card.placed { opacity: 0.4; cursor: not-allowed; pointer-events: none; background: #f1f5f9; }
+.sentence-card .sent-letter {
+  font-weight: 700; color: #fff;
+  background: var(--jk-navy);
+  border-radius: 3px;
+  padding: 3px 9px;
+  font-size: 14px;
+  flex-shrink: 0;
+  min-width: 26px;
+  text-align: center;
+}
+.sentence-card .sent-text { flex: 1; font-weight: 500; }
+
+.drag-hint {
+  font-size: 12.5px;
+  color: #6b6b6b;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+/* EXTRACT MATCHING (Section E) */
+.extract-tabs {
+  display: flex; gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.extract-tab {
+  padding: 8px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  background: transparent;
+  position: relative;
+  top: 1px;
+  border: 1px solid transparent;
+  border-bottom: none;
+}
+.extract-tab.active {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-bottom: 1px solid #fff;
+  color: var(--jk-navy);
+}
+.extract-tab:not(.active):hover { background: #f4f6f8; }
+.extract-content { font-size: 15.5px; line-height: 1.6; }
+.extract-content p { margin: 0 0 14px; }
+.extract-content p:last-child { margin-bottom: 0; }
+.extract-content .extract-label {
+  font-weight: 700;
+  font-size: 17px;
+  margin-bottom: 8px;
+  display: block;
+  color: var(--jk-navy);
+}
+
+.em-statement-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 90px;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+.em-statement-row:last-child { border-bottom: none; }
+.em-statement-num {
+  font-weight: 700; color: var(--jk-navy);
+  padding-top: 8px; font-size: 14.5px;
+}
+.em-statement-text {
+  font-size: 14.5px; line-height: 1.45; padding-top: 4px;
+}
+.em-select select {
+  font-family: inherit;
+  font-size: 15px;
+  padding: 7px 28px 7px 12px;
+  border: 1.5px solid #5a5a5a;
+  border-radius: 2px;
+  background: #fff;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 34px;
+  cursor: pointer;
+  font-weight: 500;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><polygon points='0,0 10,0 5,6' fill='%23002664'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+/* BOTTOM BAR */
+.bottom-bar {
+  display: flex; align-items: stretch;
+  height: 60px; flex-shrink: 0;
+  background: #fff;
+  border-top: 1px solid var(--border);
+}
+.bottom-bar .btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 15.5px; font-weight: 600;
+  padding: 0 24px; gap: 8px; height: 100%;
+}
+.btn-prev, .btn-next {
+  background: var(--jk-navy); color: #fff; min-width: 130px;
+}
+.btn-prev:hover, .btn-next:hover { background: var(--jk-navy-dark); }
+.btn-prev { margin-right: auto; }
+.btn-next { margin-left: auto; }
+.btn-prev:disabled, .btn-next:disabled {
+  opacity: 0.4; cursor: not-allowed;
+  background: #888;
+}
+.btn-submit-final {
+  background: var(--jk-gold);
+  color: var(--jk-navy);
+  margin-left: auto;
+  min-width: 160px;
+  font-weight: 700;
+}
+.btn-submit-final:hover { background: #b89348; color: #fff; }
+
+/* Question grid (progress) */
+.q-progress-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 14px;
+  background: #f4f6f8;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow-x: auto;
+  align-items: center;
+}
+.q-progress-strip .label {
+  font-size: 11px; font-weight: 700;
+  color: var(--muted);
+  margin-right: 8px;
+  white-space: nowrap;
+}
+.q-pill {
+  width: 26px; height: 26px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600;
+  border-radius: 4px;
+  background: #fff;
+  border: 1px solid #c7c7c7;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.12s;
+  flex-shrink: 0;
+}
+.q-pill:hover { background: #e7ecf2; }
+.q-pill.answered {
+  background: var(--jk-navy);
+  color: #fff;
+  border-color: var(--jk-navy);
+}
+.q-pill.current {
+  outline: 2px solid var(--jk-gold);
+  outline-offset: 1px;
+}
+.q-pill-divider {
+  width: 1px; height: 18px;
+  background: #c7c7c7;
+  margin: 0 4px;
+}
+
+/* COVER / NAME ENTRY */
+.cover-screen {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px 20px;
+  background: var(--bg-page);
+  overflow-y: auto; min-height: 0;
+}
+.cover-card {
+  background: #fff;
+  border: 3px solid var(--jk-navy);
+  padding: 40px 48px;
+  max-width: 600px; width: 100%;
+  text-align: center;
+  border-radius: 4px;
+  box-shadow: 0 4px 24px rgba(0, 38, 100, 0.12);
+}
+.cover-card .brand-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 60px; height: 60px;
+  background: var(--jk-navy); color: #fff;
+  font-family: 'Lora', Georgia, serif; font-weight: 700;
+  font-size: 26px; border-radius: 6px;
+  margin: 0 auto 18px; position: relative;
+}
+.cover-card .brand-mark::after {
+  content: ""; position: absolute;
+  bottom: 5px; right: 5px;
+  width: 9px; height: 9px;
+  background: var(--jk-gold); border-radius: 50%;
+}
+.cover-card h1 {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 24px; font-weight: 600;
+  margin-bottom: 6px; color: var(--jk-navy);
+}
+.cover-card .subtitle { font-size: 14.5px; color: #555; margin-bottom: 20px; }
+.cover-card .question {
+  font-size: 17px; font-weight: 600;
+  margin-bottom: 14px; line-height: 1.4;
+}
+.cover-card .sub {
+  font-size: 13px; margin-bottom: 26px;
+  color: #555; line-height: 1.55;
+}
+.cover-actions {
+  display: flex; gap: 16px;
+  justify-content: center; flex-wrap: wrap;
+}
+.cover-actions button {
+  background: var(--jk-navy); color: #fff;
+  font-size: 15px; font-weight: 600;
+  padding: 11px 32px; min-width: 120px;
+  border-radius: 3px;
+}
+.cover-actions button:hover { background: var(--jk-navy-dark); }
+.cover-actions button.secondary { background: #e5e8ec; color: #1a1a1a; }
+.cover-actions button.secondary:hover { background: #d8dde2; }
+.cover-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+.name-input {
+  width: 100%; font-size: 17px;
+  padding: 13px 14px; border: 2px solid var(--border);
+  border-radius: 3px; margin-bottom: 8px; text-align: center;
+}
+.name-input:focus { outline: none; border-color: var(--jk-navy); }
+.name-hint { font-size: 12.5px; color: #888; margin-bottom: 22px; }
+.section-overview {
+  background: #f8f9fb;
+  border-left: 3px solid var(--jk-navy);
+  padding: 12px 16px;
+  margin-bottom: 22px;
+  text-align: left;
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+.section-overview .row { display: flex; justify-content: space-between; gap: 8px; }
+.section-overview .row strong { color: var(--jk-navy); min-width: 80px; }
+.back-link {
+  display: inline-block; margin-top: 18px;
+  font-size: 13px; color: var(--muted);
+  text-decoration: none;
+}
+.back-link:hover { color: var(--jk-navy); }
+
+/* MODAL */
+.modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-card {
+  background: #fff;
+  border: 3px solid var(--jk-navy);
+  padding: 30px 36px;
+  max-width: 520px;
+  width: calc(100% - 40px);
+  text-align: center;
+  border-radius: 4px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  animation: slideUp 0.25s ease-out;
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-card.warning { border-color: var(--flag-orange); }
+.modal-card h2 { font-size: 20px; margin-bottom: 12px; color: var(--jk-navy); }
+.modal-card.warning h2 { color: var(--flag-orange); }
+.modal-card p { margin-bottom: 16px; font-size: 14.5px; line-height: 1.55; }
+.modal-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.modal-actions button {
+  background: var(--jk-navy); color: #fff;
+  padding: 10px 26px; font-weight: 600; font-size: 14.5px;
+  min-width: 100px; border-radius: 3px;
+}
+.modal-actions button:hover { background: var(--jk-navy-dark); }
+.modal-actions button.secondary { background: #e5e8ec; color: #1a1a1a; }
+.modal-actions button.secondary:hover { background: #d8dde2; }
+.unanswered-list {
+  background: #fef3c7;
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #78350f;
+  text-align: left;
+}
+
+/* RESULTS */
+.results-screen {
+  flex: 1; background: var(--bg-page);
+  padding: 30px 20px 60px;
+  overflow-y: auto; min-height: 0;
+}
+.results-card {
+  background: #fff;
+  border: 3px solid var(--jk-navy);
+  border-radius: 6px;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 36px;
+  text-align: center;
+}
+.results-card h1 {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 26px; margin-bottom: 6px; color: var(--jk-navy);
+}
+.results-card .student-line { font-size: 14px; color: #555; margin-bottom: 20px; }
+.score-display { display: flex; justify-content: center; align-items: baseline; gap: 14px; margin-bottom: 6px; }
+.score-display .score { font-size: 60px; font-weight: 700; color: var(--jk-navy); line-height: 1; }
+.score-display .total { font-size: 30px; color: #888; font-weight: 500; }
+.score-pct { font-size: 20px; font-weight: 600; color: var(--jk-gold); margin-bottom: 8px; }
+.score-time { font-size: 13px; color: #666; margin-bottom: 18px; }
+
+.section-scores {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 18px 0 24px;
+}
+.section-score-cell {
+  background: #f4f6f8;
+  border-radius: 4px;
+  padding: 10px 8px;
+  text-align: center;
+}
+.section-score-cell .label {
+  font-size: 11px; font-weight: 700;
+  color: var(--jk-navy);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.section-score-cell .val {
+  font-size: 18px; font-weight: 700;
+  color: #1a1a1a;
+}
+.section-score-cell .max {
+  font-size: 12px; color: #888;
+}
+
+.results-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.results-actions button {
+  background: var(--jk-navy); color: #fff;
+  padding: 11px 22px; font-size: 14.5px; font-weight: 600;
+  border-radius: 3px; min-width: 130px;
+}
+.results-actions button:hover { background: var(--jk-navy-dark); }
+.results-actions button.secondary { background: #e5e8ec; color: #1a1a1a; }
+.results-actions button.secondary:hover { background: #d8dde2; }
+.upload-status { margin-top: 16px; font-size: 13px; color: #666; }
+.upload-status.success { color: var(--correct-green); }
+.upload-status.error { color: var(--wrong-red); }
+
+/* REVIEW */
+.review-banner {
+  background: var(--jk-navy);
+  color: #fff;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.review-banner .info { display: flex; gap: 18px; align-items: center; }
+.review-banner .badge {
+  background: rgba(255,255,255,0.18);
+  padding: 5px 12px; border-radius: 12px;
+  font-weight: 700; font-size: 12px;
+}
+.review-banner button {
+  background: rgba(255,255,255,0.18); color: #fff;
+  padding: 7px 14px; font-size: 13px; font-weight: 600;
+  border-radius: 3px; border: 1px solid rgba(255,255,255,0.35);
+}
+.review-banner button:hover { background: rgba(255,255,255,0.28); }
+.review-content {
+  flex: 1; overflow-y: auto;
+  padding: 24px 32px;
+  background: var(--bg-page);
+  min-height: 0;
+}
+.review-content-inner { max-width: 920px; margin: 0 auto; }
+.review-section-title {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 22px; color: var(--jk-navy);
+  margin: 24px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--jk-navy);
+}
+.review-section-title:first-child { margin-top: 0; }
+.review-row {
+  background: #fff;
+  padding: 14px 18px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  border-left: 4px solid var(--jk-navy);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.review-row.correct { border-left-color: var(--correct-green); background: #f0fdf4; }
+.review-row.wrong { border-left-color: var(--wrong-red); background: #fef2f2; }
+.review-row .header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.review-row .qref { font-weight: 700; color: var(--jk-navy); font-size: 14px; }
+.review-row .review-status {
+  font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 10px;
+  letter-spacing: 0.4px;
+}
+.review-row .review-status.correct { background: var(--correct-green); color: #fff; }
+.review-row .review-status.wrong { background: var(--wrong-red); color: #fff; }
+.review-row .stem { font-weight: 500; margin-bottom: 6px; color: #1a1a1a; }
+.review-row .answer-line { font-size: 13.5px; margin-bottom: 4px; }
+.review-row .user-ans { color: var(--wrong-red); }
+.review-row .correct-ans { color: var(--correct-green); font-weight: 600; }
+.solution-toggle-btn {
+  background: var(--jk-gold); color: #1a1a1a;
+  font-weight: 700; padding: 7px 12px;
+  font-size: 12.5px; border-radius: 3px;
+  margin-top: 6px;
+}
+.solution-toggle-btn:hover { background: #b89348; }
+.solution-panel {
+  margin-top: 8px;
+  background: #fffbeb;
+  border: 1px solid var(--jk-gold);
+  border-radius: 4px;
+  padding: 11px 14px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.solution-panel h4 {
+  font-size: 11.5px; font-weight: 700;
+  color: var(--jk-navy); margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.solution-panel p { margin-bottom: 8px; }
+
+@media (max-width: 900px) {
+  .pane-left, .pane-right { padding: 16px 16px; }
+  .center-cluster { min-width: 200px; padding: 8px 14px; }
+  .center-cluster .q-title { font-size: 14px; }
+  .top-bar { height: 64px; }
+  .timer-digits .num { font-size: 20px; }
+  .jk-logo .text { display: none; }
+  .section-tab { padding: 0 12px; font-size: 12.5px; }
+  .section-tab .badge { font-size: 10px; padding: 1px 6px; min-width: 26px; }
+  .em-statement-row { grid-template-columns: 28px 1fr 80px; }
+  .section-scores { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ============================================================
+   GOOGLE SHEETS ENDPOINT
+   Paste your Apps Script Web App URL here to enable auto-collection.
+   ============================================================ */
+const GOOGLE_SHEETS_URL = '';
+
+const TEST_META = {
+  testId: 'OC-Reading-Practice-Set1',
+  title: 'OC Reading Practice',
+  durationSeconds: 1800,  // 30 minutes
+  totalQuestions: 33
+};
+
+/* ============================================================
+   SECTIONS DATA
+   ============================================================ */
+const SECTIONS = [
+  { id: 'A', label: 'Section A', range: 'Q1–6',  start: 1,  end: 6,  type: 'mcq-passage' },
+  { id: 'B', label: 'Section B', range: 'Q7–14', start: 7,  end: 14, type: 'cloze' },
+  { id: 'C', label: 'Section C', range: 'Q15–19',start: 15, end: 19, type: 'mcq-poem' },
+  { id: 'D', label: 'Section D', range: 'Q20–25',start: 20, end: 25, type: 'gap-text' },
+  { id: 'E', label: 'Section E', range: 'Q26–33',start: 26, end: 33, type: 'extract-match' }
+];
+
+/* SECTION A · The Day the Drifter Came */
+const SECTION_A = {
+  passageTitle: 'The Day the Drifter Came',
+  passageSubtitle: "It is Cloudwool Morning at the lighthouse — the day each month when the Skylings drop their old wool down the chimney for Wren's grandmother to weave into blankets.",
+  passageHtml: `<p>It was Cloudwool Morning at the lighthouse, and Wren was already on the kitchen floor sorting the new bundles when her grandmother came in with a face that did not quite match the day.</p>
+<p>Cloudwool Morning came once a month, when the Skylings — the small soft creatures who lived above the cliff — dropped their old wool through the chimney for Nana Bly to weave into blankets. The Skylings were exactly punctual. They came on the second Wednesday of every month, never late, never early, and Nana had been catching their wool since she was Wren's age.</p>
+<p>But this morning, when Wren opened the chimney trap, only one bundle had fallen through, and it was a strange dark grey she had never seen before. The Skyling wool was always white, or pale yellow, or — in summer — a soft sea-blue.</p>
+<p>Tin-tin, the lighthouse cat, sniffed the dark grey bundle, sneezed, and walked away as though the bundle had personally insulted him.</p>
+<p>'A Drifter,' Nana Bly said, when she saw it.</p>
+<p>'A what?' said Wren.</p>
+<p>Nana sat down at the table. She did not, Wren noticed, sit down the way she usually did, which was with a small grunt and a stretching of one knee. She sat down the way someone sits when they have had a piece of news.</p>
+<p>'A Drifter is a Skyling who has not kept its promises,' Nana said. 'Every Skyling makes a Quill-mark when it comes of age — a kind of contract about how it will behave. A Drifter is one that has wandered off the agreed paths. The wool is always like that — dark, off-colour, full of bits of cloud the Skyling shouldn't have flown through.'</p>
+<p>'Is that bad?' Wren asked.</p>
+<p>'It is mostly only bad for the Drifter,' Nana said. 'But it can be a small problem for whoever catches the wool.'</p>
+<p>She did not explain what the small problem was.</p>
+<p>Tin-tin, who had been watching the conversation from the top of the bread bin, gave Wren <strong>a look that the cat himself would have described, if anyone had asked him, as deeply meaningful</strong>. Wren, however, was eleven and not always good at reading cats.</p>
+<p>There was a knock at the door.</p>
+<p>It was Mr Quill, the postman, who came once a week with letters from the mainland and stayed for a cup of Hush-tea before climbing back down the cliff path. Today he had a letter for Nana with a red Pip-bell stamp on the corner — the kind of stamp used only for messages from the Skyling Council.</p>
+<p>'I think this might be about your morning bundle,' Mr Quill said, and looked at the dark grey Cloudwool on the floor with a small, interested whistle.</p>
+<p>Nana opened the letter. She read it once. She read it again. She folded it and put it in the pocket of her apron.</p>
+<p>Then she stood up and said, in a voice Wren had never quite heard her use before, 'Wren, my love, would you and Tin-tin go and ask Mrs Pip if she has <strong>any extra light</strong>?'</p>
+<p>Mrs Pip lived in the small cottage at the foot of the cliff. She kept lamps and lanterns and the special slow-burning wicks that the lighthouse used in winter. Wren had been to her cottage many times, but never, until this moment, on Cloudwool Morning, and never with the word light used in the way Nana had just used it — not quite as a thing, and not quite as a request.</p>
+<p>Wren looked at her grandmother. Her grandmother looked steadily back.</p>
+<p>Tin-tin jumped down from the bread bin and walked, unhurriedly, to the door.</p>
+<p>Wren followed him.</p>
+<p>Behind them, in the kitchen, the dark grey bundle of Cloudwool sat very still on the floor, <strong>like something that had not yet decided whether it was sorry</strong>.</p>`,
+  questions: [
+    { qNum: 1, correct: 'B',
+      stem: 'Wren first realises that Cloudwool Morning is unusual when',
+      options: {
+        A: 'Tin-tin sneezes at the new bundle of wool.',
+        B: 'the bundle is a colour she has never seen before.',
+        C: 'Mr Quill arrives with an unexpected letter.',
+        D: 'her grandmother comes in with a worried face.'
+      },
+      solution: { evidence: "Wren has been told that the Skylings are 'exactly punctual' and that their wool is always 'white, or pale yellow, or — in summer — a soft sea-blue'. The first sign that something is wrong is when the bundle through the chimney is 'a strange dark grey she had never seen before'. The colour is the first break with the usual rule.",
+        whyNot: "<strong>A</strong> (Tin-tin sneezes) is sequence error — the cat's reaction comes after Wren has already seen the colour. <strong>C</strong> (Mr Quill arrives) is sequence error — the postman arrives much later. <strong>D</strong> (grandmother's worried face) is the strong partial truth — mentioned in the very first sentence, but Wren is on the floor sorting bundles when she first notices the dark grey colour, not her grandmother's face." } },
+    { qNum: 2, correct: 'C',
+      stem: "The detail that Nana Bly does not sit down 'the way she usually did' is included to suggest that",
+      options: {
+        A: "Nana's knee has been giving her serious pain lately.",
+        B: 'Nana is in a hurry to start weaving the new wool.',
+        C: 'Nana is preparing herself to deliver difficult information.',
+        D: 'Nana is annoyed that the Skylings have made a mistake.'
+      },
+      solution: { evidence: "The writer carefully describes Nana's usual sitting — 'with a small grunt and a stretching of one knee' — and then says she sits this time 'the way someone sits when they have had a piece of news'. The detail is included so the reader notices, before Wren does, that Nana is settling herself for a difficult conversation.",
+        whyNot: "<strong>A</strong> is keyword trap — the word 'knee' appears in the description of the USUAL posture; today's posture is precisely not the painful one. <strong>B</strong> is character inversion — sitting down is the opposite of starting work. <strong>D</strong> is tone misread — there is no anger; the tone is weighted calm." } },
+    { qNum: 3, correct: 'A',
+      stem: "When Tin-tin gives Wren 'a look that the cat himself would have described, if anyone had asked him, as deeply meaningful', the writer is",
+      options: {
+        A: 'making fun of how seriously Tin-tin takes himself.',
+        B: 'hinting that cats can sense the future before people can.',
+        C: 'showing that Tin-tin has been trained to act like a person.',
+        D: 'suggesting that Wren has hurt the cat without meaning to.'
+      },
+      solution: { evidence: "The writer's joke is in the careful clause 'if anyone had asked him' — Tin-tin would, of course, describe his own look as 'deeply meaningful', because cats think highly of themselves. The follow-up line 'Wren, however, was eleven and not always good at reading cats' confirms the comic register. The sentence is warm humour about cat self-importance, not a mystical signal.",
+        whyNot: "<strong>B</strong> (mystical overread) is the strongest distractor — in a fantasy world the supernatural reading feels plausible, but the conditional 'would have described, if anyone had asked' is the form of comic self-importance, not mystical sensing. <strong>C</strong> reads 'acted like a person' literally — the writer is anthropomorphising for humour, not recording training. <strong>D</strong> imports a hurt the passage does not signal." } },
+    { qNum: 4, correct: 'C',
+      stem: "The word 'light' in 'any extra light' is used by Nana in a way that",
+      options: {
+        A: 'means lamps and lanterns, exactly as Mrs Pip would understand it.',
+        B: 'is too soft and easy to be the kind of thing a Drifter would need.',
+        C: 'makes Wren suspect the word has another meaning beyond ordinary lamps.',
+        D: 'refers to the start of a fire to burn the dark grey wool safely.'
+      },
+      solution: { evidence: "Wren's direct perception is the cue: 'not quite as a thing, and not quite as a request'. The careful phrasing tells us that Wren senses the word is being used in a special, agreed-upon way that she has not learned yet — Mrs Pip will know, and Nana knows that she will, but Wren is being sent without the explanation.",
+        whyNot: "<strong>A</strong> takes the word at face value, ignoring Wren's narrated discomfort with the phrasing. <strong>B</strong> imports the 'low weight' meaning of 'light' into a sentence about whether a Drifter would need it. <strong>D</strong> imports 'light a fire' meaning and invents a violent plot direction the passage does not develop." } },
+    { qNum: 5, correct: 'D',
+      stem: "Mr Quill's behaviour shows that he",
+      options: {
+        A: 'has come to the lighthouse because he is afraid of the Drifter.',
+        B: 'is more interested in tea than in the news he is delivering.',
+        C: 'has been sent specifically by the Skyling Council with a warning.',
+        D: 'already knows something about the morning Wren has not been told.'
+      },
+      solution: { evidence: "Mr Quill arrives with the letter precisely on Cloudwool Morning, gives the dark grey wool 'a small, interested whistle', and remarks 'I think this might be about your morning bundle' — all of which suggest he is not surprised. He is part of the network of adults who already know how Drifters are dealt with, and Wren is, for now, outside that network.",
+        whyNot: "<strong>A</strong> (afraid of the Drifter) is tone inversion — 'interested whistle' is curiosity, not fear. <strong>B</strong> (more interested in tea than news) is character inversion — the tea is the routine; today's behaviour is news-focused. <strong>C</strong> is the strong partial truth — the Council stamp is real, but Mr Quill is established as the regular weekly postman, not a special envoy." } },
+    { qNum: 6, correct: 'D',
+      stem: "The closing image of the dark grey bundle 'like something that had not yet decided whether it was sorry' is included to",
+      options: {
+        A: 'hint that the bundle itself may have feelings of its own.',
+        B: 'explain why the Skylings are usually punctual on Wednesdays.',
+        C: 'remind the reader that wool cannot really apologise for anything.',
+        D: "suggest that the Drifter's story is not finished yet."
+      },
+      solution: { evidence: "The closing image is a piece of careful misdirection by the writer — a bundle of wool cannot really feel sorry, and the sentence is not asking us to believe that it can. What the image does is leave the reader with the sense that the Drifter's story is still going on — the wool is sitting there, the matter is unresolved, and the door has just closed behind Wren and Tin-tin on a morning that has not yet finished happening. The phrase 'not yet' is the key signal of forward-opening time.",
+        whyNot: "<strong>A</strong> (literal interpretation) is the strong distractor — in a fantasy world students may reach for literal magic, but the writer says 'like something'; the simile is the device, not a claim about wool consciousness. <strong>B</strong> (reverse logic) — punctuality has already been established; the closing has nothing to add. <strong>C</strong> (authorial intrusion) is true but irrelevant — the question asks why the writer included the image." } }
+  ]
+};
+
+/* SECTION B · Cloze · The Story of Cotton */
+const SECTION_B = {
+  passageTitle: 'The Story of Cotton',
+  passageSubtitle: 'Informational — textile history',
+  // Use {{N}} for inline gap markers
+  bodyHtml: `<p>Cotton has been {{7}} by human hands for at least seven thousand years. Small fragments of cotton thread, found in the ruins of ancient cities along the Indus river, {{8}} by archaeologists to be among the oldest known textiles in the world.</p>
+<p>In the centuries that followed, the trade in cotton {{9}} along caravan routes across central Asia. By the early Middle Ages, fine cotton cloth from India was being {{10}} to markets as far away as eastern Africa and the Mediterranean.</p>
+<p>The deep, rich colours of these early cottons came from natural {{11}} produced from plants, insects and minerals. The most prized of all was indigo, a {{12}} blue extracted from a small green leaf and used to dye cloth that was, in some markets, more valuable than silk.</p>
+<p>The great change came with the Industrial Revolution. New steam-powered mills could produce, in a single hour, more cotton cloth than a skilled village weaver could make in a month — and entirely {{13}} the textile trade. Today, cotton remains the most widely used natural fibre on the planet, with global production now measured in {{14}} of tonnes per year.</p>`,
+  gaps: [
+    { qNum: 7,  correct: 'C', options: { A: 'used', B: 'made', C: 'woven', D: 'seen' },
+      solution: { evidence: "'Woven by human hands' is the precise verb for cloth-making by hand. 'Weave' specifically captures the textile-creation process. The phrase 'human hands' is a strong text cue — only weaving is a hand process specific to cotton/textiles.",
+        whyNot: "'Used by human hands' is too generic. 'Made by human hands' is grammatically valid but generic; cotton thread is specifically WOVEN. 'Seen by human hands' is grammatically wrong — hands don't see." } },
+    { qNum: 8,  correct: 'B', options: { A: 'said', B: 'reckoned', C: 'thought', D: 'believed' },
+      solution: { evidence: "'Reckoned to be' is the precise formal verb for expert academic judgement. 'Reckon' in formal use means 'to consider or judge' (different from casual 'I reckon'). Standard formal vocabulary in archaeological and historical writing.",
+        whyNot: "'Said to be' is grammatically valid but generic. 'Thought to be' suggests speculation. 'Believed to be' suggests faith without evidence. 'Reckoned' captures evidence-based professional judgement." } },
+    { qNum: 9,  correct: 'A', options: { A: 'flourished', B: 'grew', C: 'spread', D: 'ran' },
+      solution: { evidence: "'Flourished' is the precise formal verb for trade or commerce thriving and growing successfully over time. Standard formal historical-economic vocabulary.",
+        whyNot: "'Grew along' suggests size increase only — 'flourished' captures both growth AND vitality. 'Spread along' suggests geographic expansion only. 'Ran along' suggests passive existence — wrong meaning for an expanding trade." } },
+    { qNum: 10, correct: 'D', options: { A: 'sold', B: 'carried', C: 'sent', D: 'exported' },
+      solution: { evidence: "'Exported to markets' is the precise formal economic verb for goods being sent across borders for sale. The phrase 'as far away as eastern Africa' is a strong cue for cross-border commerce.",
+        whyNot: "'Sold' is generic. 'Carried' captures only transport, not commerce. 'Sent' is too generic. 'Exported' is the precise commercial term for international trade." } },
+    { qNum: 11, correct: 'A', options: { A: 'dyes', B: 'tints', C: 'paints', D: 'inks' },
+      solution: { evidence: "'Natural dyes' is the precise textile-domain term for colouring substances used to stain fabric. The text confirms this: the next paragraph mentions indigo 'used to dye cloth'.",
+        whyNot: "'Tints' suggests light, surface colouring — wrong domain. 'Paints' are for surfaces, not absorbed cloth colouring. 'Inks' are for writing/printing surfaces — wrong domain." } },
+    { qNum: 12, correct: 'B', options: { A: 'bright', B: 'deep', C: 'dark', D: 'rich' },
+      solution: { evidence: "'Deep blue' is the precise formal collocation for rich, intense blue colour. 'Deep' specifically pairs with colour names to describe saturation and richness.",
+        whyNot: "'Bright blue' suggests vivid lightness — indigo is dark and saturated, not bright. 'Dark blue' is grammatically valid but plain. 'Rich blue' is close in meaning, but 'rich' was already used nearby ('deep, rich colours') — using it again would be redundant." } },
+    { qNum: 13, correct: 'A', options: { A: 'altered', B: 'changed', C: 'shifted', D: 'dominated' },
+      solution: { evidence: "'Altered the trade' is the precise formal verb for significant change to an established system. The adverb 'entirely' is a strong cue — the new mills changed everything.",
+        whyNot: "'Changed the trade' is grammatically valid but generic — 'altered' is more precise. 'Shifted' suggests moving sideways — wrong magnitude for permanent fundamental change. 'Dominated' would mean took control of, not altered." } },
+    { qNum: 14, correct: 'D', options: { A: 'thousands', B: 'measures', C: 'tens', D: 'millions' },
+      solution: { evidence: "'Millions of tonnes' is the precise statistical phrase for global cotton production scale. The text emphasises 'most widely used natural fibre on the planet' — global scale demands 'millions'.",
+        whyNot: "'Thousands of tonnes' is too small for global cotton production. 'Measures of tonnes' is grammatically odd. 'Tens of tonnes' is far too small." } }
+  ]
+};
+
+/* SECTION C · The Quiet Boy */
+const SECTION_C = {
+  poemTitle: 'The Quiet Boy',
+  poemSubtitle: 'Year 4 OC Practice Poem',
+  poemHtml: `He sat in the second row from the front,
+the boy who did not speak.
+His pencil moved when others' moved.
+His book opened when others' opened.
+But his mouth stayed closed.
+
+Someone seeing him
+might think him empty,
+might think him bored,
+might say he had nothing to add.
+
+No. He was full.
+<strong>He was full of waiting.</strong>
+He was full of the kind of thinking
+that does not need to be heard to happen.
+
+We did not know this then.
+We thought he was the quiet one.
+We thought he was the dull one.
+We were wrong about that, all of us.
+
+One Wednesday, in science,
+the teacher held up a glass of water
+and asked us why ice floats.
+We said the things we always said.
+
+Then the boy lifted his hand —
+<strong>the way you lift a leaf</strong> —
+and asked: 'What if water is the only thing
+that gets bigger when it freezes?'
+
+The teacher stopped. She said: yes.
+She said: that's the question.
+She said: that is exactly the question.
+
+We had been talking around it for years.
+He had been listening for years.
+
+<strong>Such silence from a boy,
+such loudness from one quiet thing he said.</strong>`,
+  questions: [
+    { qNum: 15, correct: 'A',
+      stem: "The phrase 'He was full of waiting' suggests the boy",
+      options: {
+        A: 'was holding something inside until the right moment.',
+        B: 'was hungry and looking forward to the next meal.',
+        C: 'was waiting for the school day to end so he could go home.',
+        D: 'was being patient with the slow pace of the class.'
+      },
+      solution: { evidence: "'Full of waiting' uses 'full' to suggest contained energy or thought, ready to emerge. The boy is holding something inside — a question, a thought — until the right moment comes. The next lines confirm: 'He was full of the kind of thinking / that does not need to be heard to happen.'",
+        whyNot: "<strong>C</strong> is the strongest distractor — a quiet, still student who 'waits' is most commonly assumed to be waiting for school to end. The poem reverses this: he's waiting WITH content, not waiting for relief. <strong>B</strong> takes 'full' as physical fullness. <strong>D</strong> takes 'waiting' as patient endurance, missing the contained-energy meaning." } },
+    { qNum: 16, correct: 'B',
+      stem: "In stanza 6, what is described as being lifted 'the way you lift a leaf'?",
+      options: {
+        A: 'the glass of water from the science demonstration.',
+        B: "the boy's hand.",
+        C: "the boy's question.",
+        D: "the teacher's attention."
+      },
+      solution: { evidence: "'Then the boy lifted his hand — / the way you lift a leaf' — the simile applies to 'his hand', the closest noun. Hands are physical things you lift; the comparison to lifting a leaf gives the gesture its quiet, careful quality.",
+        whyNot: "<strong>A</strong> (glass of water) is the strongest distractor — the glass in the previous stanza is a vivid object, and 'lift' is something you do to objects; students may carry the glass image across stanzas. <strong>C</strong> and <strong>D</strong> abstract 'lift' to non-physical things (a question, attention) — but the simile points to the physical hand." } },
+    { qNum: 17, correct: 'B',
+      stem: "What is the speaker's tone in the final stanza?",
+      options: {
+        A: 'regretful.',
+        B: 'humbled.',
+        C: 'amazed.',
+        D: 'sympathetic.'
+      },
+      solution: { evidence: "'We had been talking around it for years. / He had been listening for years.' — the speaker recognises that they were all loud and wrong while he was quiet and right. 'Humbled' captures this lowering of self-estimate.",
+        whyNot: "<strong>A</strong> 'regretful' implies wishing things had been different — the speaker isn't expressing wish but recognition. <strong>C</strong> 'amazed' overstates — the tone is quieter, more reflective. <strong>D</strong> 'sympathetic' implies feeling FOR the boy; the speaker feels reduced BY him." } },
+    { qNum: 18, correct: 'D',
+      stem: "The lines 'Such silence from a boy, / such loudness from one quiet thing he said' suggest",
+      options: {
+        A: 'the boy was capable of speaking very loudly when needed.',
+        B: "the boy's silence was actually a kind of secret protest.",
+        C: 'loud people are always less wise than quiet ones.',
+        D: 'his small contribution carried more meaning than years of talk.'
+      },
+      solution: { evidence: "'Such loudness from one quiet thing he said' — the comparison is between volume of speech and volume of meaning. His one quiet question carried more meaning than all the years of talking around the topic.",
+        whyNot: "<strong>C</strong> is the strongest distractor — 'quiet people are wiser than loud people' is a common aphorism, and the poem appears to support it. But the poem isn't making a general claim about quiet vs loud; it's about THIS boy's question carrying meaning. <strong>A</strong> takes 'loudness' literally. <strong>B</strong> invents protest motive." } },
+    { qNum: 19, correct: 'A',
+      stem: 'What is the central message of the poem?',
+      options: {
+        A: 'Listening can be a form of thinking that we do not see.',
+        B: 'Quiet children should be encouraged to speak in class.',
+        C: 'Still waters run deep.',
+        D: 'We should not judge people on first appearances.'
+      },
+      solution: { evidence: "'He had been listening for years.' — the boy's silence was full activity (listening, thinking) that nobody could see. The poem's specific claim is about LISTENING as invisible activity.",
+        whyNot: "<strong>C</strong> 'Still waters run deep' is the strongest distractor — the most famous proverb about quiet thoughtful people, and the poem appears to illustrate it perfectly. But the poem's specific claim is about LISTENING as invisible activity, not about quiet people being deep. <strong>B</strong> is competitive (school message). <strong>D</strong> is too general — about first appearances." } }
+  ]
+};
+
+/* SECTION D · The Language Barrier · Gap Text */
+const SECTION_D = {
+  passageTitle: 'The Language Barrier',
+  bodyHtml: `<p>All human languages are complex. Whether spoken by ten people or ten million, a language contains enough structure to express any idea its speakers need to communicate. This fact has long puzzled linguists, because it means that even languages that formed recently, among people who had no formal instruction and no shared starting point, arrived at the same level of sophistication as languages that developed over thousands of years. Understanding how this happens has become one of the central problems in the study of how language works.</p>
+<p>When two groups who share no common language are brought into prolonged contact, they typically develop a pidgin — a stripped-down communication system that borrows words from both languages but follows no consistent grammatical rules. {{20}} The need to communicate drives linguistic invention even when speakers have no formal training and no shared starting point. What surprised researchers was not that pidgins formed, but how quickly they could develop into something more complex. A pidgin is not a complete language: it lacks the grammatical structure needed to express complicated ideas, and its speakers use it as a temporary bridge rather than a mother tongue. What happens next, linguists have observed, is more interesting. {{21}} Within a generation, what began as improvised communication has typically become a creole — a full language, with consistent grammar, capable of expressing anything its speakers need to say.</p>
+<p>The role of children in this transformation is decisive. When both adults and children are exposed to a pidgin, it is the children who drive the development of the creole — not the adults. {{22}} By the time the first generation of native creole speakers had grown up, the language they used was more grammatically consistent than anything the adults around them had produced. In the hands of children, it had become something new.</p>
+<p>The same pattern of age effects appears when people learn established languages rather than creating new ones. Studies of immigrant communities consistently find that age at arrival in a new country is among the strongest predictors of how well a person will eventually acquire the local language. {{23}} The gap did not appear to be about effort or motivation. Adults who studied intensively and immersed themselves in the language for years still fell short of the fluency that children appeared to acquire almost without trying.</p>
+<p>The most striking evidence for the role of age in language learning came not from immigrant surveys but from the study of a language that had not existed a generation earlier. {{24}} When deaf children in Nicaragua were brought together in schools for the first time in the 1970s, they had no shared language. Within a few years, the youngest children in those schools had developed a grammatical system that the older children around them had not. One researcher described the observation as the closest thing to the birth of a language that science had ever been able to witness.</p>
+<p>The creole research, the immigrant surveys, and the Nicaraguan experiment all pointed in the same direction: the younger a person is when exposed to a language, the more completely they appear to acquire it. {{25}}</p>
+<p>The child who arrives in a new country at the age of five and the adult who arrives at forty-five both face the same task. What each of them brings to it, and what each of them can achieve, appears to be fundamentally different — though exactly what changes, at what age, and why it changes at all remains, for all the research conducted in the past century, not fully known.</p>`,
+  gaps: [
+    { qNum: 20, correct: 'D',
+      solution: { evidence: "Sentence D ('For most researchers working in the field, this came as no surprise') provides a meta-comment confirming the previous claim about pidgin formation. 'This' refers to the formation of pidgins; 'came as no surprise' links to the next sentence's explanation of why ('the need to communicate drives linguistic invention').",
+        whyNot: "<strong>F</strong> describes how a pidgin develops INTO something more complex — wrong stage; F belongs at Gap 21. <strong>B</strong> (the extra) imports bilingual households — outside the topic of pidgin formation." } },
+    { qNum: 21, correct: 'F',
+      solution: { evidence: "Sentence F ('It gathers vocabulary, borrows grammar, and settles into patterns its speakers begin to treat as rules') describes the process by which a pidgin develops grammatical structure. 'It' refers to the pidgin; the three verbs (gathers, borrows, settles) describe progressive complexification. The next sentence confirms the result: 'what began as improvised communication has typically become a creole.'",
+        whyNot: "<strong>A</strong> describes children passing language on — wrong stage; A belongs at Gap 22. <strong>G</strong> describes a specific case (sign language) — wrong scope; G belongs at Gap 24." } },
+    { qNum: 22, correct: 'A',
+      solution: { evidence: "Sentence A ('The children who learned it first passed it on to those who arrived later, refining it as they did') describes the children's active role in developing the creole. 'The children who learned it first' picks up the previous sentence's claim about children driving development; 'refining it as they did' explains how the consistency described in the next sentence emerged.",
+        whyNot: "<strong>B</strong> (extra) introduces bilingual executive function — outside the topic. <strong>C</strong> describes immigrant fluency — wrong section; belongs at Gap 23." } },
+    { qNum: 23, correct: 'C',
+      solution: { evidence: "Sentence C ('Younger learners achieved near-native fluency, while older arrivals rarely lost their accents entirely') makes the abstract claim about age-as-predictor concrete. 'Younger … older' specifies the predictor's direction; the next sentence ('the gap did not appear to be about effort') refers to this very gap between younger and older arrivals.",
+        whyNot: "<strong>G</strong> describes a specific case (sign language) — wrong scope. <strong>E</strong> is a closing summary — wrong placement; E belongs at Gap 25." } },
+    { qNum: 24, correct: 'G',
+      solution: { evidence: "Sentence G ('In one documented case, a new sign language emerged complete with complex grammar within a single generation') names the specific case. The phrase 'a language that had not existed a generation earlier' from the prior sentence is picked up by G's 'a new sign language … within a single generation'. The next sentence ('deaf children in Nicaragua') elaborates the case G has just introduced.",
+        whyNot: "<strong>E</strong> is a closing summary — wrong placement. <strong>B</strong> (extra) imports bilingual households — outside the Nicaragua story." } },
+    { qNum: 25, correct: 'E',
+      solution: { evidence: "Sentence E ('Despite decades of study, the question of whether there is a critical age for language acquisition remained open') provides the closing acknowledgment of unresolved scientific debate. The next paragraph ('The child who arrives in a new country …') elaborates this open question through a specific contrast.",
+        whyNot: "<strong>B</strong> (extra) introduces bilingual households — outside the topic of critical age." } }
+  ],
+  sentences: [
+    { letter: 'A', text: 'The children who learned it first passed it on to those who arrived later, refining it as they did.' },
+    { letter: 'B', text: 'As well as this, children raised in bilingual households showed measurably stronger executive function than monolingual peers.' },
+    { letter: 'C', text: 'Younger learners achieved near-native fluency, while older arrivals rarely lost their accents entirely.' },
+    { letter: 'D', text: 'For most researchers working in the field, this came as no surprise.' },
+    { letter: 'E', text: 'Despite decades of study, the question of whether there is a critical age for language acquisition remained open.' },
+    { letter: 'F', text: 'It gathers vocabulary, borrows grammar, and settles into patterns its speakers begin to treat as rules.' },
+    { letter: 'G', text: 'In one documented case, a new sign language emerged complete with complex grammar within a single generation.' }
+  ],
+  extraLetter: 'B',
+  extraNote: "Sentence B is the unused option — it describes bilingual households and executive function, a related but separate topic. The connective 'As well as this' demands a prior described observation about children's cognitive abilities, which is not present at any gap in the text."
+};
+
+/* SECTION E · Doors · Extract Matching */
+const SECTION_E = {
+  theme: 'doors',
+  extracts: [
+    { letter: 'A', label: 'Extract A',
+      html: `<span class="extract-label">Extract A</span>
+<p>My grandmother's house in Hobart had a small room on the second floor that was always locked. The door had been closed in our family for as long as I had been alive, and what was behind it had stood for something none of us spoke about. The brass lock had held for forty years without needing replacement. The door looked at me the way a person who knows your secret looks at you — patient, but waiting.</p>
+<p>I was fifteen when I found the key. It was in a drawer of the kitchen, pushed to the back behind some old buttons. I held it for a long time before I went upstairs. I stood at the top of the stairs for longer. The hinges turned without any sound at all when I finally pushed.</p>
+<p>Inside were my grandfather's things — his clothes, his books, photographs, a watch on the bedside table. He had died ten years before I was born. My grandmother had kept the room exactly as he had left it. After I went in, nothing in the family was the same. I have wished, since then, that I had simply put the key back in the drawer. My grandmother died the following winter, and the room is no one's now.</p>` },
+    { letter: 'B', label: 'Extract B',
+      html: `<span class="extract-label">Extract B</span>
+<p>A door is held in place by hinges — small metal joints that allow it to swing open and closed without falling away from its frame. The smoothness with which a door moves depends on the quality of these hinges. Hinges that are well oiled and properly aligned allow the door to swing easily; hinges that have rusted or shifted out of position make the door stick or scrape. The weight of the door also affects how it moves: a heavy door requires stronger hinges and more careful alignment.</p>
+<p>A lock keeps a door secure by stopping it from being opened by anyone who does not have the key. Inside a typical lock are small metal pins of different lengths. The correct key pushes each pin to exactly the right height; only then can the lock turn. The lock works like a small puzzle that only one shape can solve. Modern automatic doors slide open as soon as a person approaches. Engineers must pause before opening a heavy fire door, and front doors of houses have signalled status for centuries.</p>` },
+    { letter: 'C', label: 'Extract C',
+      html: `<span class="extract-label">Extract C</span>
+<p>The Berlin Wall divided the city of Berlin from 1961 until 1989. At its centre stood the Brandenburg Gate, an eighteenth-century stone gateway that had become — once the wall went up around it — the most photographed symbol of the divided city. For almost three decades the gate stood closed, and the wall had been kept locked tight, with armed guards at every crossing.</p>
+<p>On the evening of 9 November 1989, the East German government announced that citizens would be allowed to cross. The first guard hesitated before raising the barrier. Within hours, crowds had gathered on both sides of the wall. The gate stood open like a question finally being answered, and the heavy gates swung outward as the crowds pressed forward. Guards had been ordered not to open the gates that night, but the order was eventually overridden. Some who had built the wall would later say they wished they had not. The Brandenburg Gate has stood as a symbol of reunification ever since.</p>` },
+    { letter: 'D', label: 'Extract D',
+      html: `<span class="extract-label">Extract D</span>
+<p>In traditional Japanese houses, the doors between rooms are not hinged. They slide along grooves cut into the floor and ceiling. These sliding doors are called 'shoji' — wooden frames covered with thin white paper. A shoji door becomes the wall the way a held breath becomes the silence around it — you do not notice it until it moves.</p>
+<p>When fully opened, the shoji disappears between rooms entirely, allowing one large space where two had been. Shoji are not designed to lock; privacy depends on courtesy. Those approaching a shoji paused first to announce themselves, and guests waited to be invited rather than opening shoji themselves. Shoji slide rather than swing. Craftsmen sometimes wished they had used different paper, but the design itself — light, quiet, both wall and door — has come to represent traditional Japanese aesthetics around the world.</p>` }
+  ],
+  statements: [
+    { qNum: 26, correct: 'A', text: 'describes a writer who opened a door they should not have',
+      solution: { evidence: "Extract A describes the narrator at fifteen finding a key, going upstairs, and opening the door of a small locked room in their grandmother's house. The narrator opened a door they should not have, and the consequence is made explicit: 'after I went in, nothing in the family was the same.'",
+        whyNot: "Extract C mentions guards being ordered not to open the gates — historical guards, not a writer. Extract D mentions guests waiting to be invited rather than opening shoji themselves — the social rule, not a writer who broke it. Only A presents a single writer in the first person who opened a specific door they should not have." } },
+    { qNum: 27, correct: 'C', text: 'mentions a door that became a symbol',
+      solution: { evidence: "Extract C describes the Brandenburg Gate as 'the most photographed symbol of the divided city' and notes that 'the Brandenburg Gate has stood as a symbol of reunification ever since'.",
+        whyNot: "Extract A's locked room 'had stood for something none of us spoke about' — a private, family-internal symbol, not a recognised public symbol. Extract D mentions shoji doors having 'come to represent traditional Japanese aesthetics' — symbolic, but a category, not a single named door. Only C names a specific door that became a recognised public symbol." } },
+    { qNum: 28, correct: 'B', text: 'explains how a lock keeps something secure',
+      solution: { evidence: "Extract B explains: 'Inside a typical lock are small metal pins of different lengths. The correct key pushes each pin to exactly the right height; only then can the lock turn.'",
+        whyNot: "Extract A mentions 'the brass lock had held for forty years' — lock security as observation of duration, not an explanation. Extract C mentions 'the wall had been kept locked tight' — a fact, not an explanation. Extract D mentions shoji not being designed to lock — the absence of locks. Only B explains the mechanism." } },
+    { qNum: 29, correct: 'A', text: 'describes a writer who hesitated before doing something',
+      solution: { evidence: "Extract A describes the narrator finding the key, 'held it for a long time before I went upstairs. I stood at the top of the stairs for longer.' Two hesitations before opening the door.",
+        whyNot: "Extract C mentions 'the first guard hesitated before raising the barrier' — historical guard, not a writer. Extract D mentions those approaching a shoji 'paused first to announce themselves' — a custom, not a writer. Extract B mentions engineers having to pause — a profession. Only A presents a writer in the first person hesitating." } },
+    { qNum: 30, correct: 'D', text: 'uses figurative language to describe a door',
+      solution: { evidence: "Extract D: 'A shoji door becomes the wall the way a held breath becomes the silence around it — you do not notice it until it moves.' The connecting phrase 'the way' marks this as a simile describing the shoji door itself — what kind of thing it is.",
+        whyNot: "Extract A's 'the door looked at me the way a person who knows your secret looks at you' is a simile, but describes the door's emotional presence to the writer, not the door as a physical object. Extract C's 'the gate stood open like a question finally being answered' describes the moment of opening, not the gate itself. Extract B's 'the lock works like a small puzzle' describes a lock, not a door. Only D uses figurative language to describe a door itself." } },
+    { qNum: 31, correct: 'A', text: 'mentions a writer who later regretted their action',
+      solution: { evidence: "Extract A ends: 'I have wished, since then, that I had simply put the key back in the drawer.' Explicit personal regret for a specific past action.",
+        whyNot: "Extract C mentions 'some who had built the wall would later say they wished they had not' — historical figures, not a writer. Extract D mentions craftsmen sometimes wishing they had used different paper — a craft regret, no specific writer. Only A presents a single writer's explicit regret for their own past action." } },
+    { qNum: 32, correct: 'C', text: 'describes a moment when a barrier disappeared',
+      solution: { evidence: "Extract C describes the moment on 9 November 1989 when the gates were opened: 'the heavy gates swung outward as the crowds pressed forward.' The barrier dividing Berlin disappeared in this specific historical moment.",
+        whyNot: "Extract D mentions that 'when fully opened, the shoji disappears between rooms entirely' — a barrier disappearing, but as a routine domestic event, not a specific moment. Extract A mentions family change after the writer entered — gradual, not a single moment. Extract B mentions automatic doors sliding open — a routine mechanism. Only C describes a specific historical moment when a barrier vanished." } },
+    { qNum: 33, correct: 'B', text: 'explains why some doors swing more easily',
+      solution: { evidence: "Extract B explains: 'Hinges that are well oiled and properly aligned allow the door to swing easily; hinges that have rusted or shifted out of position make the door stick or scrape. The weight of the door also affects how it moves.'",
+        whyNot: "Extract A mentions 'the hinges turning without any sound at all' — observed, not explained. Extract C mentions 'the heavy gates swinging outward' — swinging, but no explanation of ease. Extract D mentions that 'shoji slide rather than swing' — different motion. Only B explains the mechanism of swing ease." } }
+  ]
+};
+
+/* Build a flat questions table for easy lookup (qNum -> { section, correct, ... }) */
+const ALL_QUESTIONS = {};
+SECTION_A.questions.forEach(q => ALL_QUESTIONS[q.qNum] = { ...q, sectionId: 'A' });
+SECTION_B.gaps.forEach(g => ALL_QUESTIONS[g.qNum] = { ...g, sectionId: 'B' });
+SECTION_C.questions.forEach(q => ALL_QUESTIONS[q.qNum] = { ...q, sectionId: 'C' });
+SECTION_D.gaps.forEach(g => ALL_QUESTIONS[g.qNum] = { ...g, sectionId: 'D' });
+SECTION_E.statements.forEach(s => ALL_QUESTIONS[s.qNum] = { ...s, sectionId: 'E' });
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const STATE = {
+  screen: 'name', // name | confirm | test | submitConfirm | timeUp | submitted | review
+  studentName: '',
+  startedAt: null,
+  finishedAt: null,
+  timerSeconds: TEST_META.durationSeconds,
+  timerHidden: false,
+  currentSection: 'A',
+  // answers[qNum] = letter (A/B/C/D for MCQ; A-G for D)
+  answers: {},
+  draggingSentence: null, // for Section D
+  activeExtract: 0,       // for Section E
+  showSolution: {},
+  uploadStatus: 'pending'
+};
+
+let timerInterval = null;
+const root = document.getElementById('app');
+
+/* ============================================================
+   RENDER ROUTING
+   ============================================================ */
+function render() {
+  switch (STATE.screen) {
+    case 'name': renderNameEntry(); break;
+    case 'confirm': renderConfirm(); break;
+    case 'test': renderTest(); break;
+    case 'submitConfirm': renderTest(); renderSubmitModal(); break;
+    case 'timeUp': renderTest(); renderTimeUpModal(); break;
+    case 'submitted': renderResults(); break;
+    case 'review': renderReview(); break;
+  }
+}
+
+/* === SCROLL PRESERVATION (drag-drop) === */
+function _scrollMap() {
+  const m = new Map();
+  document.querySelectorAll('.pane-left, .pane-right').forEach((el, i) => {
+    const key = el.className + '|' + i;
+    m.set(key, el.scrollTop);
+  });
+  return m;
+}
+function _applyScroll(m) {
+  if (!m || m.size === 0) return;
+  const apply = () => {
+    document.querySelectorAll('.pane-left, .pane-right').forEach((el, i) => {
+      const key = el.className + '|' + i;
+      if (m.has(key)) el.scrollTop = m.get(key);
+    });
+  };
+  requestAnimationFrame(() => requestAnimationFrame(apply));
+}
+function renderPreservingScroll() {
+  const positions = _scrollMap();
+  render();
+  _applyScroll(positions);
+}
+
+/* ============================================================
+   COMMON UI
+   ============================================================ */
+function jkLogo() {
+  return `<div class="jk-logo">
+    <div class="mark">JK</div>
+    <div class="text"><span class="l1">JK COACHING</span><span class="l2">COLLEGE</span></div>
+  </div>`;
+}
+
+function topBar() {
+  let timerCls = '';
+  if (STATE.timerSeconds <= 60) timerCls = 'danger';
+  else if (STATE.timerSeconds <= 300) timerCls = 'warning';
+  return `<div class="top-bar">
+    <div class="left-cluster">
+      <button class="zoom-btn" onclick="zoomToggle()">+</button>
+      <div class="timer-block ${timerCls}">
+        <div class="timer-digits" style="${STATE.timerHidden ? 'visibility:hidden' : ''}">${formatTimer()}</div>
+        ${STATE.timerHidden ? '' : `<div class="timer-labels"><span>Hours</span><span>Mins</span><span>Secs</span></div>`}
+      </div>
+      <button class="hide-time-btn" onclick="toggleHideTime()">${STATE.timerHidden ? 'Show time' : 'Hide time'}</button>
+    </div>
+    <div class="center-cluster"><span class="q-title">${TEST_META.title} · 30 min · ${TEST_META.totalQuestions} questions</span></div>
+    <div class="right-cluster">${jkLogo()}</div>
+  </div>`;
+}
+
+function topBarSimple(text) {
+  return `<div class="top-bar">
+    <div class="left-cluster"><button class="zoom-btn">+</button></div>
+    <div class="center-cluster"><span class="q-title">${text}</span></div>
+    <div class="right-cluster">${jkLogo()}</div>
+  </div>`;
+}
+
+function sectionNav() {
+  const tabs = SECTIONS.map(s => {
+    const answered = countAnswered(s.start, s.end);
+    const total = s.end - s.start + 1;
+    return `<button class="section-tab ${STATE.currentSection === s.id ? 'active' : ''}"
+                    onclick="switchSection('${s.id}')">
+      ${s.label} · ${s.range}
+      <span class="badge">${answered}/${total}</span>
+    </button>`;
+  }).join('');
+  return `<div class="section-nav">${tabs}</div>`;
+}
+
+function questionStrip() {
+  let pills = '<div class="q-progress-strip"><span class="label">Questions</span>';
+  let lastSection = null;
+  for (let q = 1; q <= 33; q++) {
+    const sec = ALL_QUESTIONS[q].sectionId;
+    if (lastSection && lastSection !== sec) {
+      pills += '<span class="q-pill-divider"></span>';
+    }
+    lastSection = sec;
+    const answered = !!STATE.answers[q];
+    const isCurrent = STATE.currentSection === sec;
+    pills += `<button class="q-pill ${answered ? 'answered' : ''} ${isCurrent ? 'current' : ''}"
+                      onclick="jumpToQuestion(${q})">${q}</button>`;
+  }
+  pills += '</div>';
+  return pills;
+}
+
+/* ============================================================
+   NAME / CONFIRM SCREENS
+   ============================================================ */
+function renderNameEntry() {
+  root.innerHTML = `
+    ${topBarSimple(TEST_META.title + ' · ' + TEST_META.totalQuestions + ' questions · 30 minutes')}
+    <div class="cover-screen">
+      <div class="cover-card">
+        <div class="brand-mark">JK</div>
+        <h1>JK Coaching College</h1>
+        <div class="subtitle">Opportunity Class Reading Practice</div>
+        <div class="question">Please enter your name to begin</div>
+        <div class="sub">
+          You will have <strong>30 minutes</strong> to answer <strong>33 questions</strong> across 5 sections.<br>
+          You can move freely between sections during the test.
+        </div>
+        <div class="section-overview">
+          <div class="row"><strong>Section A</strong><span>Single passage · Q1–6</span></div>
+          <div class="row"><strong>Section B</strong><span>Cloze (word choice) · Q7–14</span></div>
+          <div class="row"><strong>Section C</strong><span>Poetry · Q15–19</span></div>
+          <div class="row"><strong>Section D</strong><span>Gap sentences · Q20–25</span></div>
+          <div class="row"><strong>Section E</strong><span>Four extracts · Q26–33</span></div>
+        </div>
+        <input type="text" class="name-input" id="nameInput" placeholder="e.g. Sarah Kim"
+               value="${escapeHtml(STATE.studentName)}"
+               oninput="STATE.studentName = this.value; document.getElementById('startBtn').disabled = !this.value.trim();"
+               onkeypress="if(event.key === 'Enter' && this.value.trim()) goConfirm()">
+        <div class="cover-actions">
+          <button id="startBtn" ${STATE.studentName.trim() ? '' : 'disabled'} onclick="goConfirm()">Continue</button>
+        </div>
+        <a href="../" class="back-link">← Back to home</a>
+      </div>
+    </div>`;
+  setTimeout(() => document.getElementById('nameInput')?.focus(), 50);
+}
+
+function renderConfirm() {
+  root.innerHTML = `
+    ${topBarSimple('')}
+    <div class="cover-screen">
+      <div class="cover-card">
+        <div class="brand-mark">JK</div>
+        <h1>${escapeHtml(STATE.studentName)}</h1>
+        <div class="subtitle">OC Reading Practice — 33 questions, 30 minutes</div>
+        <div class="question">Ready to begin?</div>
+        <div class="sub">The 30-minute timer will start when you click Yes.<br>When time runs out the test will be submitted automatically.</div>
+        <div class="cover-actions">
+          <button class="secondary" onclick="STATE.screen='name'; render();">No, go back</button>
+          <button onclick="startTest()">Yes, start</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   TEST SCREEN — dispatches to section renderers
+   ============================================================ */
+function renderTest() {
+  const sec = SECTIONS.find(s => s.id === STATE.currentSection);
+  let content = '';
+  let isSinglePane = false;
+  switch (sec.type) {
+    case 'mcq-passage': content = renderSectionA(); break;
+    case 'cloze':       content = renderSectionB(); isSinglePane = true; break;
+    case 'mcq-poem':    content = renderSectionC(); break;
+    case 'gap-text':    content = renderSectionD(); break;
+    case 'extract-match': content = renderSectionE(); break;
+  }
+
+  // Find current section index for prev/next nav
+  const idx = SECTIONS.findIndex(s => s.id === sec.id);
+  const isFirst = idx === 0;
+  const isLast = idx === SECTIONS.length - 1;
+
+  root.innerHTML = `
+    ${topBar()}
+    ${sectionNav()}
+    ${questionStrip()}
+    <div class="content${isSinglePane ? ' single-pane' : ''}">${content}</div>
+    <div class="bottom-bar">
+      <button class="btn btn-prev" ${isFirst ? 'disabled' : ''} onclick="prevSection()">← Previous</button>
+      ${isLast
+        ? '<button class="btn btn-submit-final" onclick="goSubmit()">Submit Test ▸</button>'
+        : '<button class="btn btn-next" onclick="nextSection()">Next →</button>'}
+    </div>`;
+}
+
+/* ============================================================
+   SECTION A · MCQ on passage
+   ============================================================ */
+function renderSectionA() {
+  const left = `
+    <div class="section-header">Section A · The Day the Drifter Came</div>
+    <div class="section-subhead">Read the text below, then answer Questions 1–6 on the right.</div>
+    <div class="passage-title">${SECTION_A.passageTitle}</div>
+    <div class="passage-subtitle"><em>${escapeHtml(SECTION_A.passageSubtitle)}</em></div>
+    <div class="passage-body">${SECTION_A.passageHtml}</div>`;
+
+  const right = `
+    <div class="section-header">Questions 1–6</div>
+    <div class="section-subhead">Choose the option (A, B, C or D) you think best answers each question.</div>
+    ${SECTION_A.questions.map(q => mcqBlock(q)).join('')}`;
+
+  return `<div class="pane-left">${left}</div><div class="pane-right">${right}</div>`;
+}
+
+function mcqBlock(q) {
+  const sel = STATE.answers[q.qNum] || '';
+  return `<div class="mcq-block">
+    <div class="mcq-stem"><span class="q-num">${q.qNum}.</span><span>${escapeHtml(q.stem)}</span></div>
+    <div class="mcq-options">
+      ${['A','B','C','D'].map(L => `
+        <div class="mcq-option ${sel === L ? 'selected' : ''}" onclick="setMcqAnswer(${q.qNum}, '${L}')">
+          <span class="opt-letter">${L}</span>
+          <span>${escapeHtml(q.options[L])}</span>
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+function setMcqAnswer(qNum, letter) {
+  STATE.answers[qNum] = letter;
+  // Update visuals without re-rendering everything (preserves scroll naturally)
+  const block = event.currentTarget.closest('.mcq-block');
+  if (block) {
+    block.querySelectorAll('.mcq-option').forEach(el => el.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+  }
+  // Update progress strip lightly
+  updateProgressStripVisual();
+  updateSectionBadges();
+}
+
+/* ============================================================
+   SECTION B · Cloze (inline dropdowns) — single pane
+   ============================================================ */
+function renderSectionB() {
+  let body = SECTION_B.bodyHtml.replace(/\{\{(\d+)\}\}/g, (_, qNum) => {
+    const q = SECTION_B.gaps.find(g => g.qNum === Number(qNum));
+    const sel = STATE.answers[qNum] || '';
+    const optionsHtml = ['A','B','C','D'].map(L =>
+      `<option value="${L}" ${sel === L ? 'selected' : ''}>${escapeHtml(q.options[L])}</option>`
+    ).join('');
+    return `<span class="cloze-gap">
+      <span class="cloze-gap-num">Q${qNum}</span>
+      <select class="cloze-select" onchange="setClozeAnswer(${qNum}, this.value)">
+        <option value="" ${!sel ? 'selected' : ''}>— select —</option>
+        ${optionsHtml}
+      </select>
+    </span>`;
+  });
+
+  return `<div class="pane-left" style="max-width: 900px; margin: 0 auto;">
+    <div class="section-header">Section B · ${SECTION_B.passageTitle}</div>
+    <div class="section-subhead">Read the text below and select the correct word for each gap. <em>${SECTION_B.passageSubtitle}</em></div>
+    <div class="cloze-paragraph">${body}</div>
+  </div>`;
+}
+
+function setClozeAnswer(qNum, letter) {
+  if (!letter) {
+    delete STATE.answers[qNum];
+  } else {
+    STATE.answers[qNum] = letter;
+  }
+  updateProgressStripVisual();
+  updateSectionBadges();
+}
+
+/* ============================================================
+   SECTION C · Poetry MCQ
+   ============================================================ */
+function renderSectionC() {
+  // Poem with stanza breaks (blank lines preserved)
+  const poemHtml = SECTION_C.poemHtml
+    .split('\n\n')
+    .map(stanza => `<div style="margin-bottom: 14px;">${stanza.replace(/\n/g, '<br>')}</div>`)
+    .join('');
+
+  const left = `
+    <div class="section-header">Section C · Poem</div>
+    <div class="section-subhead">Read the poem, then answer Questions 15–19. For Q19 consider the poem as a whole.</div>
+    <div class="poem-title">${SECTION_C.poemTitle}</div>
+    <div class="poem-subtitle"><em>${SECTION_C.poemSubtitle}</em></div>
+    <div class="poem-body">${poemHtml}</div>`;
+
+  const right = `
+    <div class="section-header">Questions 15–19</div>
+    <div class="section-subhead">Choose the option (A, B, C or D) you think best answers each question.</div>
+    ${SECTION_C.questions.map(q => mcqBlock(q)).join('')}`;
+
+  return `<div class="pane-left">${left}</div><div class="pane-right">${right}</div>`;
+}
+
+/* ============================================================
+   SECTION D · Gap Text (drag sentences into inline gaps)
+   ============================================================ */
+function renderSectionD() {
+  const placedSet = new Set(Object.values(STATE.answers).filter(v => /^[A-G]$/.test(v)));
+
+  let bodyHtml = SECTION_D.bodyHtml.replace(/\{\{(\d+)\}\}/g, (_, qNum) => {
+    const sel = STATE.answers[qNum];
+    if (sel && /^[A-G]$/.test(sel)) {
+      const sent = SECTION_D.sentences.find(s => s.letter === sel);
+      const previewShort = sent.text.length > 70 ? sent.text.slice(0, 70) + '…' : sent.text;
+      return `<span class="gap-inline filled"
+                    data-gap="${qNum}"
+                    ondragover="gapDragOver(event, '${qNum}')"
+                    ondragleave="gapDragLeave(event)"
+                    ondrop="gapDrop(event, '${qNum}')">
+        <span class="gap-label">Q.${qNum}</span>
+        <span class="gap-content"><strong>${sel}.</strong> ${escapeHtml(previewShort)}</span>
+        <span class="gap-clear" onclick="clearGap('${qNum}'); event.stopPropagation();" title="Remove">✕</span>
+      </span>`;
+    }
+    return `<span class="gap-inline"
+                  data-gap="${qNum}"
+                  ondragover="gapDragOver(event, '${qNum}')"
+                  ondragleave="gapDragLeave(event)"
+                  ondrop="gapDrop(event, '${qNum}')">
+      <span class="gap-label">Q.${qNum}</span>
+      <span class="gap-content">______________________</span>
+    </span>`;
+  });
+
+  const sentencesHtml = SECTION_D.sentences.map(s => {
+    const placed = placedSet.has(s.letter);
+    return `<div class="sentence-card ${placed ? 'placed' : ''}"
+                  draggable="${placed ? 'false' : 'true'}"
+                  ondragstart="sentDragStart(event, '${s.letter}')"
+                  ondragend="sentDragEnd(event)">
+      <span class="sent-letter">${s.letter}</span>
+      <span class="sent-text">${escapeHtml(s.text)}</span>
+    </div>`;
+  }).join('');
+
+  const left = `
+    <div class="section-header">Section D · ${SECTION_D.passageTitle}</div>
+    <div class="section-subhead">Six sentences have been removed from the text. Drag each sentence (A–G) into the matching gap. One sentence is extra.</div>
+    <div class="passage-body">${bodyHtml}</div>`;
+
+  const right = `
+    <div class="section-header">Sentences A–G</div>
+    <div class="drag-hint">Drag each sentence onto the gap (Q.20–Q.25) where it best fits.</div>
+    <div class="sentences-list">${sentencesHtml}</div>`;
+
+  return `<div class="pane-left">${left}</div><div class="pane-right">${right}</div>`;
+}
+
+function sentDragStart(ev, letter) {
+  STATE.draggingSentence = letter;
+  ev.dataTransfer.effectAllowed = 'move';
+  try { ev.dataTransfer.setData('text/plain', letter); } catch (_) {}
+  ev.currentTarget.classList.add('dragging');
+}
+function sentDragEnd(ev) {
+  ev.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.gap-inline.drag-over').forEach(el => el.classList.remove('drag-over'));
+}
+function gapDragOver(ev, qNum) {
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = 'move';
+  ev.currentTarget.classList.add('drag-over');
+}
+function gapDragLeave(ev) {
+  ev.currentTarget.classList.remove('drag-over');
+}
+function gapDrop(ev, qNum) {
+  ev.preventDefault();
+  ev.currentTarget.classList.remove('drag-over');
+  let letter = STATE.draggingSentence;
+  if (!letter) {
+    const txt = ev.dataTransfer.getData('text/plain');
+    if (txt) letter = txt;
+  }
+  if (!letter) return;
+  // Remove this letter from any other gap
+  Object.keys(STATE.answers).forEach(k => {
+    if (STATE.answers[k] === letter) delete STATE.answers[k];
+  });
+  STATE.answers[qNum] = letter;
+  STATE.draggingSentence = null;
+  renderPreservingScroll();
+}
+function clearGap(qNum) {
+  delete STATE.answers[qNum];
+  renderPreservingScroll();
+}
+
+/* ============================================================
+   SECTION E · Extract matching (4 extracts in tabs + 8 dropdowns)
+   ============================================================ */
+function renderSectionE() {
+  const idx = STATE.activeExtract;
+  const activeExtract = SECTION_E.extracts[idx];
+
+  const tabs = SECTION_E.extracts.map((ex, i) =>
+    `<button class="extract-tab ${i === idx ? 'active' : ''}" onclick="setActiveExtract(${i})">${ex.label}</button>`
+  ).join('');
+
+  const stmts = SECTION_E.statements.map(st => {
+    const sel = STATE.answers[st.qNum] || '';
+    return `<div class="em-statement-row">
+      <div class="em-statement-num">${st.qNum}.</div>
+      <div class="em-statement-text">${escapeHtml(st.text)}</div>
+      <div class="em-select">
+        <select onchange="setExtractAnswer(${st.qNum}, this.value)">
+          <option value="" ${!sel ? 'selected' : ''}>—</option>
+          <option value="A" ${sel === 'A' ? 'selected' : ''}>A</option>
+          <option value="B" ${sel === 'B' ? 'selected' : ''}>B</option>
+          <option value="C" ${sel === 'C' ? 'selected' : ''}>C</option>
+          <option value="D" ${sel === 'D' ? 'selected' : ''}>D</option>
+        </select>
+      </div>
+    </div>`;
+  }).join('');
+
+  const left = `
+    <div class="section-header">Section E · Doors</div>
+    <div class="section-subhead">Read the four extracts on the theme of doors. For each question on the right, choose the extract (A, B, C or D). An extract may be used more than once.</div>
+    <div class="extract-tabs">${tabs}</div>
+    <div class="extract-content">${activeExtract.html}</div>`;
+
+  const right = `
+    <div class="section-header">Questions 26–33</div>
+    <div class="section-subhead">Which extract…</div>
+    ${stmts}`;
+
+  return `<div class="pane-left">${left}</div><div class="pane-right">${right}</div>`;
+}
+
+function setActiveExtract(i) {
+  STATE.activeExtract = i;
+  renderPreservingScroll();
+}
+
+function setExtractAnswer(qNum, value) {
+  if (!value) {
+    delete STATE.answers[qNum];
+  } else {
+    STATE.answers[qNum] = value;
+  }
+  updateProgressStripVisual();
+  updateSectionBadges();
+}
+
+/* ============================================================
+   PROGRESS STRIP / BADGES — light update without full re-render
+   ============================================================ */
+function updateProgressStripVisual() {
+  for (let q = 1; q <= 33; q++) {
+    const pill = document.querySelector(`.q-pill:nth-of-type(${q + 1})`); // +1 because of label
+    // simpler: query by text content
+  }
+  document.querySelectorAll('.q-progress-strip .q-pill').forEach((pill, idx) => {
+    const qNum = Number(pill.textContent);
+    if (qNum >= 1 && qNum <= 33) {
+      if (STATE.answers[qNum]) pill.classList.add('answered');
+      else pill.classList.remove('answered');
+    }
+  });
+}
+function updateSectionBadges() {
+  document.querySelectorAll('.section-tab').forEach(tab => {
+    const m = tab.textContent.match(/Q(\d+)–(\d+)/);
+    if (!m) return;
+    const start = Number(m[1]), end = Number(m[2]);
+    const answered = countAnswered(start, end);
+    const total = end - start + 1;
+    const badge = tab.querySelector('.badge');
+    if (badge) badge.textContent = `${answered}/${total}`;
+  });
+}
+function countAnswered(start, end) {
+  let n = 0;
+  for (let q = start; q <= end; q++) if (STATE.answers[q]) n++;
+  return n;
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function switchSection(id) {
+  STATE.currentSection = id;
+  STATE.activeExtract = 0;  // reset E tab
+  render();
+  // scroll panes to top
+  setTimeout(() => {
+    document.querySelectorAll('.pane-left, .pane-right').forEach(el => el.scrollTop = 0);
+  }, 0);
+}
+function prevSection() {
+  const idx = SECTIONS.findIndex(s => s.id === STATE.currentSection);
+  if (idx > 0) switchSection(SECTIONS[idx - 1].id);
+}
+function nextSection() {
+  const idx = SECTIONS.findIndex(s => s.id === STATE.currentSection);
+  if (idx < SECTIONS.length - 1) switchSection(SECTIONS[idx + 1].id);
+}
+function jumpToQuestion(qNum) {
+  const sec = ALL_QUESTIONS[qNum].sectionId;
+  if (STATE.currentSection !== sec) {
+    switchSection(sec);
+  }
+}
+
+/* ============================================================
+   SUBMIT / TIMER
+   ============================================================ */
+function goSubmit() { STATE.screen = 'submitConfirm'; render(); }
+function cancelSubmit() {
+  STATE.screen = 'test';
+  document.getElementById('submitModal')?.remove();
+}
+function finalizeSubmit() {
+  stopTimer();
+  STATE.finishedAt = Date.now();
+  STATE.screen = 'submitted';
+  document.getElementById('submitModal')?.remove();
+  document.getElementById('timeUpModal')?.remove();
+  uploadResults();
+  render();
+}
+function goConfirm() { if (!STATE.studentName.trim()) return; STATE.screen = 'confirm'; render(); }
+function startTest() {
+  STATE.screen = 'test';
+  STATE.startedAt = Date.now();
+  startTimer();
+  render();
+}
+function goReview() { STATE.screen = 'review'; render(); }
+function exitReview() { STATE.screen = 'submitted'; render(); }
+function toggleSolution(qNum) {
+  STATE.showSolution[qNum] = !STATE.showSolution[qNum];
+  render();
+}
+function restartTest() {
+  if (!confirm('Restart the test? All answers will be cleared.')) return;
+  STATE.screen = 'name';
+  STATE.studentName = '';
+  STATE.timerSeconds = TEST_META.durationSeconds;
+  STATE.timerHidden = false;
+  STATE.currentSection = 'A';
+  STATE.activeExtract = 0;
+  STATE.answers = {};
+  STATE.draggingSentence = null;
+  STATE.showSolution = {};
+  STATE.uploadStatus = 'pending';
+  STATE.startedAt = null;
+  STATE.finishedAt = null;
+  stopTimer();
+  render();
+}
+function goHome() {
+  if (STATE.screen === 'test' && Object.keys(STATE.answers).length > 0) {
+    if (!confirm('Leave the test? Your progress will be lost.')) return;
+  }
+  window.location.href = '../';
+}
+
+function startTimer() {
+  stopTimer();
+  timerInterval = setInterval(() => {
+    STATE.timerSeconds--;
+    if (STATE.timerSeconds <= 0) {
+      stopTimer();
+      STATE.timerSeconds = 0;
+      STATE.screen = 'timeUp';
+      render();
+      return;
+    }
+    updateTimerDisplay();
+  }, 1000);
+}
+function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+function updateTimerDisplay() {
+  const el = document.querySelector('.timer-digits');
+  if (el) el.innerHTML = formatTimer();
+  const block = document.querySelector('.timer-block');
+  if (block) {
+    block.classList.remove('warning', 'danger');
+    if (STATE.timerSeconds <= 60) block.classList.add('danger');
+    else if (STATE.timerSeconds <= 300) block.classList.add('warning');
+  }
+}
+function formatTimer() {
+  const h = Math.floor(STATE.timerSeconds / 3600);
+  const m = Math.floor((STATE.timerSeconds % 3600) / 60);
+  const s = STATE.timerSeconds % 60;
+  const pad = n => String(n).padStart(2, '0');
+  return `<span class="num">${pad(h)}</span><span class="colon">:</span><span class="num">${pad(m)}</span><span class="colon">:</span><span class="num">${pad(s)}</span>`;
+}
+function toggleHideTime() { STATE.timerHidden = !STATE.timerHidden; render(); }
+function zoomToggle() {
+  const cur = parseFloat(document.body.style.zoom || '1');
+  document.body.style.zoom = cur >= 1.2 ? '1' : (cur + 0.1).toFixed(1);
+}
+
+function renderSubmitModal() {
+  const unanswered = [];
+  for (let q = 1; q <= 33; q++) {
+    if (!STATE.answers[q]) unanswered.push(q);
+  }
+  const modal = document.createElement('div');
+  modal.className = 'modal-bg';
+  modal.id = 'submitModal';
+  let unansweredHtml = '';
+  if (unanswered.length > 0) {
+    unansweredHtml = `<div class="unanswered-list">
+      <strong>Unanswered:</strong> Q${unanswered.join(', Q')}
+    </div>`;
+  }
+  modal.innerHTML = `<div class="modal-card">
+    <h2>Submit your test?</h2>
+    <p>${unanswered.length > 0
+        ? `You have <strong>${unanswered.length}</strong> unanswered question${unanswered.length > 1 ? 's' : ''}.`
+        : 'You have answered all 33 questions.'}<br>
+      Once submitted, you cannot change your answers.</p>
+    ${unansweredHtml}
+    <div class="modal-actions">
+      <button class="secondary" onclick="cancelSubmit()">Go back</button>
+      <button onclick="finalizeSubmit()">Submit</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+function renderTimeUpModal() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-bg';
+  modal.id = 'timeUpModal';
+  modal.innerHTML = `<div class="modal-card warning">
+    <h2>⏰ Time's up!</h2>
+    <p>The 30 minutes are over. Your test will be submitted automatically.</p>
+    <div class="modal-actions"><button onclick="finalizeSubmit()">View Results</button></div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+/* ============================================================
+   RESULTS / REVIEW
+   ============================================================ */
+function computeScore() {
+  let total = 0;
+  const sectionScores = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+  for (let q = 1; q <= 33; q++) {
+    const correct = ALL_QUESTIONS[q].correct;
+    if (STATE.answers[q] === correct) {
+      total++;
+      sectionScores[ALL_QUESTIONS[q].sectionId]++;
+    }
+  }
+  return { total, max: 33, sectionScores };
+}
+
+function renderResults() {
+  const score = computeScore();
+  const elapsed = Math.floor((STATE.finishedAt - STATE.startedAt) / 1000);
+  const min = Math.floor(elapsed / 60);
+  const sec = elapsed % 60;
+  const pct = Math.round((score.total / score.max) * 100);
+
+  let uploadHtml = '';
+  if (STATE.uploadStatus === 'pending') uploadHtml = `<div class="upload-status">Saving results to teacher dashboard…</div>`;
+  else if (STATE.uploadStatus === 'success') uploadHtml = `<div class="upload-status success">✓ Results saved to teacher dashboard</div>`;
+  else if (STATE.uploadStatus === 'error') uploadHtml = `<div class="upload-status error">Could not save automatically. Please notify your teacher of your score.</div>`;
+
+  const sectionRanges = { A: '6', B: '8', C: '5', D: '6', E: '8' };
+
+  root.innerHTML = `
+    ${topBarSimple('Test Complete')}
+    <div class="results-screen">
+      <div class="results-card">
+        <h1>Well Done!</h1>
+        <div class="student-line"><strong>${escapeHtml(STATE.studentName)}</strong> · ${TEST_META.title}</div>
+        <div class="score-display">
+          <span class="score">${score.total}</span>
+          <span class="total">/ ${score.max}</span>
+        </div>
+        <div class="score-pct">${pct}%</div>
+        <div class="score-time">Time taken: ${min}m ${sec}s</div>
+        <div class="section-scores">
+          ${SECTIONS.map(s => `
+            <div class="section-score-cell">
+              <div class="label">SECTION ${s.id}</div>
+              <div class="val">${score.sectionScores[s.id]}<span class="max">/${sectionRanges[s.id]}</span></div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="results-actions">
+          <button onclick="goReview()">Review Answers</button>
+          <button class="secondary" onclick="restartTest()">Restart</button>
+          <button class="secondary" onclick="goHome()">Home</button>
+        </div>
+        ${uploadHtml}
+      </div>
+    </div>`;
+}
+
+function renderReview() {
+  const score = computeScore();
+  let sectionsHtml = '';
+
+  SECTIONS.forEach(sec => {
+    sectionsHtml += `<h2 class="review-section-title">Section ${sec.id} · ${sec.range}</h2>`;
+    for (let q = sec.start; q <= sec.end; q++) {
+      sectionsHtml += reviewRow(q);
+    }
+  });
+
+  // Add note about extra option for Section D
+  sectionsHtml += `<div class="review-row" style="border-left-color: var(--jk-gold);">
+    <div class="header"><span class="qref">Section D · Note: unused option (B)</span></div>
+    <div class="solution-panel"><p>${escapeHtml(SECTION_D.extraNote)}</p></div>
+  </div>`;
+
+  root.innerHTML = `
+    <div class="review-banner">
+      <div class="info">
+        <span>Reviewing</span>
+        <span class="badge">${score.total} / ${score.max}</span>
+      </div>
+      <div><button onclick="exitReview()">← Back to Results</button></div>
+    </div>
+    <div class="review-content">
+      <div class="review-content-inner">${sectionsHtml}</div>
+    </div>`;
+}
+
+function reviewRow(qNum) {
+  const q = ALL_QUESTIONS[qNum];
+  const userAns = STATE.answers[qNum];
+  const correct = q.correct;
+  const isCorrect = userAns === correct;
+  let statusBadge, rowCls;
+  if (!userAns) {
+    statusBadge = `<span class="review-status wrong">NOT ANSWERED</span>`;
+    rowCls = 'wrong';
+  } else if (isCorrect) {
+    statusBadge = `<span class="review-status correct">✓ CORRECT</span>`;
+    rowCls = 'correct';
+  } else {
+    statusBadge = `<span class="review-status wrong">✕ INCORRECT</span>`;
+    rowCls = 'wrong';
+  }
+
+  // Get stem and answers
+  let stem = '', userText = '', correctText = '';
+  if (q.sectionId === 'A' || q.sectionId === 'C') {
+    stem = q.stem;
+    userText = userAns ? `${userAns}. ${q.options[userAns]}` : '';
+    correctText = `${correct}. ${q.options[correct]}`;
+  } else if (q.sectionId === 'B') {
+    stem = `Cloze gap: select the best word`;
+    userText = userAns ? `${userAns}. ${q.options[userAns]}` : '';
+    correctText = `${correct}. ${q.options[correct]}`;
+  } else if (q.sectionId === 'D') {
+    stem = `Gap sentence`;
+    const userSent = userAns ? SECTION_D.sentences.find(s => s.letter === userAns) : null;
+    const corrSent = SECTION_D.sentences.find(s => s.letter === correct);
+    userText = userSent ? `${userAns}. ${userSent.text}` : '';
+    correctText = `${correct}. ${corrSent.text}`;
+  } else if (q.sectionId === 'E') {
+    stem = `Which extract ${q.text}`;
+    userText = userAns || '';
+    correctText = `Extract ${correct}`;
+  }
+
+  const isOpen = STATE.showSolution[qNum];
+
+  return `<div class="review-row ${rowCls}">
+    <div class="header">
+      <span class="qref">Q${qNum}</span>
+      ${statusBadge}
+    </div>
+    <div class="stem">${escapeHtml(stem)}</div>
+    ${userAns && !isCorrect ? `<div class="answer-line user-ans"><strong>Your answer:</strong> ${escapeHtml(userText)}</div>` : ''}
+    <div class="answer-line correct-ans"><strong>Correct:</strong> ${escapeHtml(correctText)}</div>
+    <button class="solution-toggle-btn" onclick="toggleSolution(${qNum})">
+      ${isOpen ? '▲ Hide solution' : '💡 Show solution'}
+    </button>
+    ${isOpen ? `<div class="solution-panel">
+      <h4>Why this is correct</h4>
+      <p>${q.solution.evidence}</p>
+      <h4>Why not the others</h4>
+      <p>${q.solution.whyNot}</p>
+    </div>` : ''}
+  </div>`;
+}
+
+/* ============================================================
+   UPLOAD
+   ============================================================ */
+function uploadResults() {
+  if (!GOOGLE_SHEETS_URL) {
+    STATE.uploadStatus = 'disabled';
+    return;
+  }
+  const score = computeScore();
+  const elapsed = Math.floor((STATE.finishedAt - STATE.startedAt) / 1000);
+  const answersStr = [];
+  for (let q = 1; q <= 33; q++) {
+    const u = STATE.answers[q] || '-';
+    const c = ALL_QUESTIONS[q].correct;
+    answersStr.push(`Q${q}:${u}(${c})`);
+  }
+
+  const payload = {
+    studentName: STATE.studentName,
+    setName: TEST_META.testId,
+    timestamp: new Date().toISOString(),
+    timestampLocal: new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' }),
+    totalScore: score.total,
+    totalPossible: score.max,
+    percentage: Math.round((score.total / score.max) * 100),
+    timeTakenSeconds: elapsed,
+    timeTakenFormatted: `${Math.floor(elapsed/60)}m ${elapsed%60}s`,
+    sectionA: score.sectionScores.A + '/6',
+    sectionB: score.sectionScores.B + '/8',
+    sectionC: score.sectionScores.C + '/5',
+    sectionD: score.sectionScores.D + '/6',
+    sectionE: score.sectionScores.E + '/8',
+    answers: answersStr.join(' | ')
+  };
+
+  STATE.uploadStatus = 'pending';
+  render();
+
+  fetch(GOOGLE_SHEETS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    STATE.uploadStatus = 'success';
+    if (STATE.screen === 'submitted') render();
+  }).catch(() => {
+    STATE.uploadStatus = 'error';
+    if (STATE.screen === 'submitted') render();
+  });
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"
+  }[c]));
+}
+
+render();
+</script>
+</body>
+</html>
